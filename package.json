@@ -1,7 +1,7 @@
 {
   "name": "coin-stopper",
   "productName": "coin-stopper",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "My Electron application description",
   "main": ".vite/build/main.js",
   "scripts": {
@@ -28,6 +28,7 @@
     "electron-devtools-installer": "^4.0.0",
     "eslint": "^8.57.1",
     "eslint-plugin-import": "^2.31.0",
+    "sass": "^1.83.1",
     "ts-node": "^10.9.2",
     "typescript": "~4.5.4",
     "vite": "^5.4.11"
@@ -39,11 +40,13 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@primevue/themes": "4.2.5",
     "@vitejs/plugin-vue": "^5.2.1",
     "chart.js": "^4.4.7",
     "electron-squirrel-startup": "^1.0.1",
+    "primeflex": "^3.3.1",
     "primeicons": "^7.0.0",
-    "primevue": "^4.2.5",
+    "primevue": "^3.53.1",
     "vue": "^3.5.13",
     "vue-chartjs": "^5.3.2"
   }

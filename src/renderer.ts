@@ -26,8 +26,17 @@
  * ```
  */
 
-import './index.css';
+import './styles/index.scss';
 import { createApp } from 'vue';
 import App from './App.vue';
 
-createApp(App).mount('#app');
+import PrimeVue from "primevue/config";
+import 'primevue/resources/themes/arya-blue/theme.css'; // Theme
+import "primevue/resources/primevue.min.css"; // PrimeVue core styles
+import "primeicons/primeicons.css"; // PrimeIcons
+import "primeflex/primeflex.css"; // PrimeFlex (optional)
+
+
+const app = createApp(App)
+app.use(PrimeVue);
+app.mount('#app');
