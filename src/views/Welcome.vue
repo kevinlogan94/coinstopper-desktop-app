@@ -25,19 +25,13 @@
   </template>
 
 <script setup lang="ts">
-// Import PrimeVue Button Component
 import Button from "primevue/button";
-
-// Import package.json to dynamically fetch the app version
 import packageInfo from "../../package.json";
 
-// Reactive state for the app version
 const version: string = packageInfo.version;
 
-// Method to handle "Create Profile" button click
 const onCreateProfile = (): void => {
   console.log("Navigating to Create Profile");
-  // Add navigation or action logic here
 };
 </script>
 
@@ -54,7 +48,5 @@ $primary-color: #42b983;
   width: 80px;
   height: auto;
 }
-
-/* Card Styling (customized for visual appeal) */
 
 </style>

@@ -29,6 +29,7 @@
 import './styles/index.scss';
 import { createApp } from 'vue';
 import App from './App.vue';
+import router from './router';
 
 import PrimeVue from "primevue/config";
 import 'primevue/resources/themes/arya-blue/theme.css'; // Theme
@@ -38,5 +39,6 @@ import "primeflex/primeflex.css"; // PrimeFlex (optional)
 
 
 const app = createApp(App)
+app.use(router)
 app.use(PrimeVue);
 app.mount('#app');
