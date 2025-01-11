@@ -1,37 +1,50 @@
 <template>
-    <div class="welcome-screen flex justify-content-center align-items-center h-screen">
-      <div class="welcome-card p-4 shadow-2 border-round bg-gray-900">
-        <!-- App Logo -->
-        <div class="logo flex justify-content-center mb-3">
-          <img src="/img/logo.png" alt="Coin Stopper Logo" class="logo-img" />
-        </div>
-  
-        <!-- Welcome Title -->
-        <h1 class="text-center text-white mb-4">Welcome to Coin Stopper</h1>
-  
-        <!-- Create Profile Button -->
-        <Button
-          label="Create Profile"
-          class="button-success w-full"
-          @click="onCreateProfile"
-        />
-  
-        <!-- Footer (Version Info) -->
-        <footer class="text-center mt-4">
-          <p class="text-sm text-gray-400">Version {{ version }}</p>
-        </footer>
+  <div
+    class="welcome-screen flex justify-content-center align-items-center h-screen"
+  >
+    <div class="welcome-card p-4 shadow-2 border-round bg-gray-900">
+      <!-- App Logo -->
+      <div class="logo flex justify-content-center mb-3">
+        <img src="/img/logo.png" alt="Coin Stopper Logo" class="logo-img" />
       </div>
+
+      <!-- Welcome Title -->
+      <h1 class="text-center text-white mb-4">Welcome to Coin Stopper</h1>
+
+      <!-- Create Profile Button -->
+      <Button
+        label="Create Profile"
+        class="button-success w-full"
+        @click="onCreateProfile"
+      />
+
+      <!-- Footer (Version Info) -->
+      <footer class="text-center mt-4">
+        <p class="text-sm text-gray-400">Version {{ version }}</p>
+      </footer>
     </div>
-  </template>
+  </div>
+</template>
 
 <script setup lang="ts">
 import Button from "primevue/button";
 import packageInfo from "../../package.json";
+import { AppData } from "main/models";
+import { readAppData, writeAppData } from "@/utility";
 
 const version: string = packageInfo.version;
 
-const onCreateProfile = (): void => {
+const onCreateProfile = async (): Promise<void> => {
   console.log("Navigating to Create Profile");
+  const appData  = {profiles: 
+    [{
+      id: "1", 
+      name: "Kevin", 
+      credentials: [{id: "1", platform: "coinbase"}]
+    }]
+  } as AppData;
+  writeAppData(appData);
+  console.log(await readAppData());
 };
 </script>
 
@@ -39,7 +52,11 @@ const onCreateProfile = (): void => {
 $primary-color: #42b983;
 /* Fullscreen layout for the welcome screen */
 .welcome-screen {
-  background: linear-gradient(135deg, $primary-color, #1a1f3c); /* Subtle gradient */
+  background: linear-gradient(
+    135deg,
+    $primary-color,
+    #1a1f3c
+  ); /* Subtle gradient */
   color: #fff; /* Default text color */
 }
 
@@ -48,5 +65,4 @@ $primary-color: #42b983;
   width: 80px;
   height: auto;
 }
-
 </style>
