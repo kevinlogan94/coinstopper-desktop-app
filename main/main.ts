@@ -1,7 +1,8 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import started from 'electron-squirrel-startup';
 import {installExtension, VUEJS_DEVTOOLS} from 'electron-devtools-installer'
+import { writeAppData, readAppData } from "./appDataManager";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -15,6 +16,8 @@ const createWindow = () => {
     height: 600,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true
     },
   });
 
@@ -66,3 +69,13 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+
+
+// Register IPC handlers that the renderer process can call
+ipcMain.handle("read-app-data", async () => {
+  return readAppData();
+});
+
+ipcMain.handle("write-app-data", async (_event, newData) => {
+  writeAppData(newData);
+});
