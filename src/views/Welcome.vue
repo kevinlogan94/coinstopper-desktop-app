@@ -17,49 +17,26 @@
         class="button-success w-full"
         @click="onCreateProfile"
       />
-
-      <!-- Footer (Version Info) -->
-      <footer class="text-center mt-4">
-        <p class="text-sm text-gray-400">Version {{ version }}</p>
-      </footer>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import Button from "primevue/button";
-import packageInfo from "../../package.json";
-import { AppData } from "main/models";
-import { readAppData, writeAppData } from "@/utility";
+import router from "@/router";
+import { onMounted } from "vue";
+import { readAppData } from "@/utility";
 
-const version: string = packageInfo.version;
+onMounted(async () => {
+  console.log(await readAppData());
+});
 
 const onCreateProfile = async (): Promise<void> => {
-  console.log("Navigating to Create Profile");
-  const appData  = {profiles: 
-    [{
-      id: "1", 
-      name: "Kevin", 
-      credentials: [{id: "1", platform: "coinbase"}]
-    }]
-  } as AppData;
-  writeAppData(appData);
-  console.log(await readAppData());
+  router.push("CreateProfile");
 };
 </script>
 
 <style lang="scss">
-$primary-color: #42b983;
-/* Fullscreen layout for the welcome screen */
-.welcome-screen {
-  background: linear-gradient(
-    135deg,
-    $primary-color,
-    #1a1f3c
-  ); /* Subtle gradient */
-  color: #fff; /* Default text color */
-}
-
 /* Logo Styling */
 .logo-img {
   width: 80px;
