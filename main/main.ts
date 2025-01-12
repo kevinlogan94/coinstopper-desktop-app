@@ -70,6 +70,12 @@ app.on('activate', () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 
+ipcMain.handle("refresh-page", async () => {
+  const win = BrowserWindow.getFocusedWindow();
+  if (win) {
+    win.reload();
+  }
+});
 
 // Register IPC handlers that the renderer process can call
 ipcMain.handle("read-app-data", async () => {

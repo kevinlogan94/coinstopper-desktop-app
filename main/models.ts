@@ -1,5 +1,5 @@
 
-interface Profile {
+export interface Profile {
     id: string;
     name: string;
     credentials: Array<Credential>
