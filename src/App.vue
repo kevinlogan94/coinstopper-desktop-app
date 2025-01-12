@@ -3,6 +3,8 @@
   <router-view />
   <footer class="footer text-center">
     <Button icon="pi pi-refresh" text @click="refreshApp"/>
+    <Button icon="pi pi-sync" text @click="restartApp"/>
+    <!-- <Button icon="pi pi-trash" text @click="restartApp"/> -->
     <p class="text-sm text-gray-400">Version {{ version }}</p>
   </footer>
 </div>
@@ -11,6 +13,7 @@
 <script lang="ts" setup>
 import Button from "primevue/button";
 import packageInfo from "../package.json";
+import router from "./router";
 
 const version: string = packageInfo.version;
 
@@ -18,6 +21,11 @@ console.log('👋 This message is being logged by "App.vue", included via Vite')
 
 const refreshApp = () => {
   window.electronAPI.refreshApp();
+}
+
+const restartApp = async () => {
+  await router.push("/");
+  await window.electronAPI.refreshApp();
 }
 </script>
 
