@@ -1,9 +1,12 @@
 <template>
-  <div
-    class="flex justify-content-center align-items-center h-screen"
-  >
+  <div class="flex justify-content-center align-items-center h-screen">
     <Card>
       <template #title>Create your profile</template>
+      <template #subtitle v-if="active == 1"
+        >We will need your Coinbase<a @click.prevent="openExternalUrl" href="">
+          Api Keys
+        </a></template
+      >
       <template #content>
         <form v-if="active == 0" @submit.prevent="active = 1">
           <div class="field">
@@ -16,7 +19,6 @@
               placeholder="Enter your username"
             />
           </div>
-
           <Button label="Submit" type="submit" class="mt-4 button-success" />
         </form>
         <form v-if="active == 1" @submit.prevent="active = 2">
@@ -97,6 +99,12 @@ const GenerateDataFromTracker = () => {
   //trigger tracker to collect data
 };
 
+const openExternalUrl = () => {
+  const coinbaseCreateApiKeysUrl =
+    "https://docs.cdp.coinbase.com/get-started/docs/cdp-api-keys";
+  window.electronAPI.openExternal(coinbaseCreateApiKeysUrl);
+};
+
 const CreateProfile = async () => {
   let appData = await readAppData();
   const newProfile = {
@@ -116,9 +124,9 @@ const CreateProfile = async () => {
 
 <style lang="scss" scoped>
 .p-card {
-    min-width: 600px;
+  min-width: 600px;
 }
 .p-inputtextarea {
-    min-width: 800px;
+  min-width: 800px;
 }
 </style>

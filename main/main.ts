@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import path from 'path';
 import started from 'electron-squirrel-startup';
 import {installExtension, VUEJS_DEVTOOLS} from 'electron-devtools-installer'
@@ -84,4 +84,9 @@ ipcMain.handle("read-app-data", async () => {
 
 ipcMain.handle("write-app-data", async (_event, newData) => {
   writeAppData(newData);
+});
+
+//Open a url on the user's default browser
+ipcMain.handle("open-external-url", async (_event, url:string) => {
+  shell.openExternal(url);
 });

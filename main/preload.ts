@@ -6,5 +6,6 @@ import { AppData } from './models';
 contextBridge.exposeInMainWorld('electronAPI', {
   readAppData: () => ipcRenderer.invoke('read-app-data'),
   writeAppData: (data: AppData) => ipcRenderer.invoke('write-app-data', data),
-  refreshApp: () => ipcRenderer.invoke('refresh-page')
+  refreshApp: () => ipcRenderer.invoke('refresh-page'),
+  openExternal: (url: string) => ipcRenderer.invoke('open-external-url', url)
 });
