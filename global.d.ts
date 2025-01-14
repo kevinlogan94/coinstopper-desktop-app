@@ -3,6 +3,7 @@ interface Window {
         readAppData: () => Promise<AppData>,
         writeAppData: (appData) => Promise<void>,
         refreshApp: () => Promise<void>,
-        openExternal: (url: string) => void
+        openExternal: (url: string) => void,
+        validateCoinbaseCredentials: () => Promise<boolean>
     };
 }

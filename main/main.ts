@@ -2,7 +2,10 @@ import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import path from 'path';
 import started from 'electron-squirrel-startup';
 import {installExtension, VUEJS_DEVTOOLS} from 'electron-devtools-installer'
-import { writeAppData, readAppData } from "./appDataManager";
+import { registerAppDataMethods } from "./services/appDataManager";
+import { registerMiscellaneousMethods } from './services/miscellaneous';
+import { registerSchedulerMethods } from './services/scheduler';
+import { registerCoinbaseMethods } from './services/coinbase';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -70,23 +73,9 @@ app.on('activate', () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 
-ipcMain.handle("refresh-page", async () => {
-  const win = BrowserWindow.getFocusedWindow();
-  if (win) {
-    win.reload();
-  }
-});
 
 // Register IPC handlers that the renderer process can call
-ipcMain.handle("read-app-data", async () => {
-  return readAppData();
-});
-
-ipcMain.handle("write-app-data", async (_event, newData) => {
-  writeAppData(newData);
-});
-
-//Open a url on the user's default browser
-ipcMain.handle("open-external-url", async (_event, url:string) => {
-  shell.openExternal(url);
-});
+registerAppDataMethods();
+registerMiscellaneousMethods();
+registerSchedulerMethods();
+registerCoinbaseMethods();

@@ -1,4 +1,4 @@
-import { app } from "electron";
+import { app, ipcMain } from "electron";
 import { readFileSync, writeFileSync } from "fs";
 import * as path from "path";
 
@@ -35,4 +35,15 @@ export const writeAppData = (data: Record<string, unknown>): void => {
   } catch (error) {
     console.error("Error writing data file:", error);
   }
+};
+
+//Register all of our methods in the main.ts logic
+export const registerAppDataMethods = () => {
+  ipcMain.handle("read-app-data", async () => {
+    return readAppData();
+  });
+
+  ipcMain.handle("write-app-data", async (_event, newData) => {
+    writeAppData(newData);
+  });
 };
