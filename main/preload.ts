@@ -8,5 +8,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
   writeAppData: (data: AppData) => ipcRenderer.invoke('write-app-data', data),
   refreshApp: () => ipcRenderer.invoke('refresh-page'),
   openExternal: (url: string) => ipcRenderer.invoke('open-external-url', url),
-  validateCoinbaseCredentials: () => ipcRenderer.invoke("coinbase-validate-credentials")
+  validateCoinbaseCredentials: (apiKey: string, apiSecret: string) => ipcRenderer.invoke("coinbase-validate-credentials", apiKey, apiSecret)
 });

@@ -36,14 +36,31 @@
             >
             <TextArea
               v-model="formData.coinbaseApiSecret"
-              placeholder="-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEIC1+v8K9Q9J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N\n-----END EC PRIVATE KEY-----\n"
+              placeholder="-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEIC1+v8K9Q98Y7J2N1l5Q8J3K5G8Y7Jsdf2N1l5Y7J2N1gfl5J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N\n-----END EC PRIVATE KEY-----\n"
               required
               class="w-full"
               auto-resize
               id="coinbaseApiSecret"
             ></TextArea>
+            <div class="flex align-items-center mt-2">
+              <Button
+                label="Test Connection"
+                @click="testConnection"
+                :loading="isLoading"
+                severity="info"
+              />
+              <span v-if="testConnectionWasRan" class="ml-2" :class="{'text-green-500': testConnectionSuccessful, 'text-red-500': !testConnectionSuccessful}">
+                {{ testConnectionMessage }}
+              </span>
+            </div>
           </div>
-          <Button label="Submit" type="submit" class="mt-4 button-success" />
+          <Button
+            label="Submit"
+            type="submit"
+            class="mt-2"
+            severity="success"
+            :disabled="!testConnectionSuccessful"
+          />
         </form>
         <form v-if="active == 2" @submit.prevent="CreateProfile">
           <div class="field">
@@ -71,11 +88,14 @@ import { readAppData, writeAppData } from "@/utility";
 import { Profile } from "main/models";
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
-import { reactive, ref } from "vue";
+import { computed, reactive, ref } from "vue";
 import Steps from "primevue/steps";
 import TextArea from "primevue/textarea";
 import Card from "primevue/card";
 
+const isLoading = ref(false);
+const testConnectionSuccessful = ref(false);
+const testConnectionWasRan = ref(false);
 const active = ref(0);
 const stepsToTake = ref([
   {
@@ -95,8 +115,24 @@ const formData = reactive({
   whiteListTokens: [],
 });
 
+const testConnectionMessage = computed(() => {
+  if (testConnectionSuccessful.value) {
+    return "Test Successful!";
+  }
+  return "Test Failed: Check your internet connection and api keys";
+});
+
 const GenerateDataFromTracker = () => {
   //trigger tracker to collect data
+};
+
+const testConnection = async () => {
+  isLoading.value = true;
+  const credentialsAreValid =
+    await window.electronAPI.validateCoinbaseCredentials(formData.coinbaseApiKey, formData.coinbaseApiSecret);
+  testConnectionSuccessful.value = credentialsAreValid;
+  isLoading.value = false;
+  testConnectionWasRan.value = true;
 };
 
 const openExternalUrl = () => {

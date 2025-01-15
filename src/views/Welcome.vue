@@ -37,10 +37,6 @@ onMounted(async () => {
   const appData = await readAppData();
   profiles.value = appData.profiles;
   console.log(profiles.value);
-
-  const t = await window.electronAPI.validateCoinbaseCredentials();
-  console.log("credentials valid:", t);
-  
 });
 
 const onCreateProfile = async (): Promise<void> => {

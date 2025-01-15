@@ -4,6 +4,6 @@ interface Window {
         writeAppData: (appData) => Promise<void>,
         refreshApp: () => Promise<void>,
         openExternal: (url: string) => void,
-        validateCoinbaseCredentials: () => Promise<boolean>
+        validateCoinbaseCredentials: (apiKey: string, apiSecret: string) => Promise<boolean>
     };
 }
