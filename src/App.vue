@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div class="app-container justify-content-center align-items-center">
   <router-view />
   <footer class="footer text-center">
     <Button icon="pi pi-refresh" text @click="refreshApp"/>

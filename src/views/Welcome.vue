@@ -18,7 +18,6 @@
         @click="onCreateProfile"
       />
     </div>
-    <DisplayProfiles v-else></DisplayProfiles>
   </div>
 </template>
 
@@ -28,7 +27,6 @@ import router from "@/router";
 import { onMounted, ref } from "vue";
 import { readAppData } from "@/utility";
 import { Profile } from "main/models";
-import DisplayProfiles from "@/components/welcome/DisplayProfiles.vue";
 
 const profiles = ref<Array<Profile>>([]);
 
@@ -36,6 +34,9 @@ onMounted(async () => {
   //todo handle appdata file not being organized yet.
   const appData = await readAppData();
   profiles.value = appData.profiles;
+  if (profiles.value.length) {
+    router.push("SelectProfile");
+  }
   console.log(profiles.value);
 });
 

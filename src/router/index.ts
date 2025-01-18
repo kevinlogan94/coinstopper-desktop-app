@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
 import Dashboard from "../views/Dashboard.vue";
 import Welcome from "../views/Welcome.vue";
 import CreateProfile from "../views/CreateProfile.vue";
+import DisplayProfiles from "@/views/SelectProfiles.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -19,6 +20,11 @@ const routes: Array<RouteRecordRaw> = [
     name: "Dashboard",
     component: Dashboard,
   },
+  {
+    path: "/selectProfile",
+    name: "selectProfile",
+    component: DisplayProfiles,
+  }
 ];
 
 const router = createRouter({

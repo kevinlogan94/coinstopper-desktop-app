@@ -1,12 +1,14 @@
 <template>
   <div class="display-profiles flex flex-column align-items-center">
-    <h2 class="text-center text-white text-xl mb-4">Profiles</h2>
+    <h2 v-if="profiles.length" class="text-center text-white text-xl mb-4">
+      Profiles
+    </h2>
 
-    <div class="flex align-items-center justify-content-center">
+    <div class="flex align-items-center justify-content-center flex-wrap gap-7">
       <div
         v-for="profile in profiles"
         :key="profile.id"
-        class="col-4 flex align-items-center flex-column"
+        class="flex align-items-center flex-column"
       >
         <div class="relative">
           <Button
@@ -25,22 +27,17 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import Button from "primevue/button";
 import router from "@/router";
+import { readAppData } from "@/utility";
 
 interface Profile {
-  id: number;
+  id: string;
   name: string;
   icon: string;
 }
-
-const profiles = ref<Profile[]>([
-  { id: 1, name: "Steven", icon: "pi pi-user" },
-  { id: 2, name: "Elisabeth", icon: "pi pi-user" },
-  { id: 3, name: "Kevin", icon: "pi pi-user" },
-  { id: 4, name: "New Profile", icon: "pi pi-plus" },
-]);
+const profiles = ref<Array<Profile>>([]);
 
 function SelectOrNewProfile(profile: Profile) {
   if (profile.name.includes("New Profile")) {
@@ -51,6 +48,18 @@ function SelectOrNewProfile(profile: Profile) {
   console.log("Select Profile");
   router.push("Dashboard");
 }
+
+onMounted(async () => {
+  const appData = await readAppData();
+  appData.profiles.forEach((profile) => {
+    profiles.value.push({
+      id: profile.id,
+      name: profile.name,
+      icon: "pi pi-user",
+    });
+  });
+  profiles.value.push({ id: "999", name: "New Profile", icon: "pi pi-plus" });
+});
 </script>
 
 <style lang="scss" scoped>
