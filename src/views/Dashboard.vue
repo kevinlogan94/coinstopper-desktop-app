@@ -10,5 +10,23 @@
   </div>
 </template>
 <script lang="ts" setup>
+import { isEmptyObject } from "@/Helpers";
+import { readAppData } from "@/utility";
+import { Profile } from "main/models";
 import Button from "primevue/button";
+import { onMounted, ref } from "vue";
+
+const profile = ref<Profile>();
+
+onMounted(async () => {
+  const appData = await readAppData();
+  if (isEmptyObject(appData)) {
+    console.error("Check your profiles");
+  } else {
+    profile.value = appData.profiles.find(profile => {
+      return profile.id == "1" //make this dynamic
+    })
+  }
+  console.log(profile.value);
+})
 </script>
