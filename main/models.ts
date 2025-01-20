@@ -6,11 +6,12 @@ export interface Profile {
   id: string;
   name: string;
   credentials: Array<Credential>;
-  config: TradingConfig;
+  trackerConfig: TrackerConfig;
+  appConfig: AppConfig;
   ledger: Array<Transaction>;
 }
 
-interface Credential {
+export interface Credential {
   id: string;
   platform: string;
   apiKey?: string;
@@ -20,8 +21,12 @@ interface Credential {
   additionalSettings?: Record<string, any>;
 }
 
+export interface AppConfig {
+  trackerEnabled: boolean
+}
+
 //global config
-export interface TradingConfig {
+export interface TrackerConfig {
   blackList: Array<string>; // List of trading pairs to exclude
   whiteList: Array<string>; // List of trading pairs to include
   runOnce: boolean; // Whether the algorithm should run only once or continuously
@@ -33,7 +38,7 @@ export interface TradingConfig {
   apiRateLimitMs: number; // Minimum delay (in milliseconds) between API requests
   simulationMode: boolean; // Whether to run the algorithm in simulation mode (no actual trades)
   overrideParameters: boolean; // Whether to use custom parameters or defaults
-  parameters: Parameters; // Configuration for trading-specific parameters
+  parameters?: Parameters; // Configuration for trading-specific parameters
 }
 
 interface Transaction {
