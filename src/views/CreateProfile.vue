@@ -19,7 +19,7 @@
               placeholder="Enter your username"
             />
           </div>
-          <Button label="Submit" type="submit" class="mt-4" severity="success" />
+          <Button label="Next" type="submit" class="mt-4" />
         </form>
         <form v-if="active == 1" @submit.prevent="CreateProfile">
           <div class="field">
@@ -49,18 +49,33 @@
                 :loading="isLoading"
                 severity="info"
               />
-              <span v-if="testConnectionWasRan" class="ml-2" :class="{'text-green-500': testConnectionSuccessful, 'text-red-500': !testConnectionSuccessful}">
+              <span
+                v-if="testConnectionWasRan"
+                class="ml-2"
+                :class="{
+                  'text-green-500': testConnectionSuccessful,
+                  'text-red-500': !testConnectionSuccessful,
+                }"
+              >
                 {{ testConnectionMessage }}
               </span>
             </div>
           </div>
-          <Button
-            label="Submit"
-            type="submit"
-            class="mt-2"
-            severity="success"
-            :disabled="!testConnectionSuccessful"
-          />
+          <div class="flex justify-content-between">
+            <Button
+              label="Back"
+              class="mt-2"
+              @click="active = 0"
+              severity="secondary"
+            />
+            <Button
+              label="Submit"
+              type="submit"
+              class="mt-2"
+              severity="success"
+              :disabled="!testConnectionSuccessful"
+            />
+          </div>
         </form>
       </template>
       <template #footer>
@@ -72,7 +87,7 @@
 
 <script lang="ts" setup>
 import router from "@/router";
-import { readAppData, writeAppData } from "@/utility";
+import { readAppData, writeAppData } from "@/helpers/ElectronHelper";
 import { Profile } from "main/models";
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
@@ -80,7 +95,8 @@ import { computed, reactive, ref } from "vue";
 import Steps from "primevue/steps";
 import TextArea from "primevue/textarea";
 import Card from "primevue/card";
-import { isEmptyObject } from "@/Helpers";
+import { isEmptyObject } from "@/helpers/Helpers";
+import { createProfile } from "@/helpers/appDataHelper";
 
 const isLoading = ref(false);
 const testConnectionSuccessful = ref(false);
@@ -92,7 +108,7 @@ const stepsToTake = ref([
   },
   {
     label: "Credentials",
-  }
+  },
 ]);
 const formData = reactive({
   username: "",
@@ -111,7 +127,10 @@ const testConnectionMessage = computed(() => {
 const testConnection = async () => {
   isLoading.value = true;
   const credentialsAreValid =
-    await window.electronAPI.validateCoinbaseCredentials(formData.coinbaseApiKey, formData.coinbaseApiSecret);
+    await window.electronAPI.validateCoinbaseCredentials(
+      formData.coinbaseApiKey,
+      formData.coinbaseApiSecret
+    );
   testConnectionSuccessful.value = credentialsAreValid;
   isLoading.value = false;
   testConnectionWasRan.value = true;
@@ -124,22 +143,12 @@ const openExternalUrl = () => {
 };
 
 const CreateProfile = async () => {
-  let appData = await readAppData();
-  let newProfileId = 1;
-
-  if (isEmptyObject(appData)) {
-    appData = { profiles: [] };
-  } else {
-    newProfileId = appData.profiles.length + 1;
-  }
-
-  const newProfile = {
-    id: newProfileId.toString(),
-    name: formData.username,
-    credentials: [{ id: "1", platform: "coinbase", apiKey: formData.coinbaseApiKey, apisecret: formData.coinbaseApiSecret }],
-  } as Profile;
-  appData.profiles.push(newProfile);
-  writeAppData(appData);
+  await createProfile(formData.username, {
+    id: "1",
+    platform: "coinbase",
+    apiKey: formData.coinbaseApiKey,
+    apisecret: formData.coinbaseApiSecret,
+  });
 
   router.push("Dashboard");
 };

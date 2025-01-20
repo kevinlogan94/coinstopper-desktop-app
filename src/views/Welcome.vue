@@ -25,7 +25,7 @@
 import Button from "primevue/button";
 import router from "@/router";
 import { onMounted, ref } from "vue";
-import { readAppData } from "@/utility";
+import { readAppData } from "@/helpers/ElectronHelper";
 import { Profile } from "main/models";
 
 const profiles = ref<Array<Profile>>([]);

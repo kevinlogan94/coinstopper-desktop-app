@@ -30,7 +30,7 @@
 import { onMounted, ref } from "vue";
 import Button from "primevue/button";
 import router from "@/router";
-import { readAppData } from "@/utility";
+import { readAppData } from "@/helpers/ElectronHelper";
 
 interface Profile {
   id: string;
