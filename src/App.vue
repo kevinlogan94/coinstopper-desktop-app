@@ -43,13 +43,6 @@ const displayCenteredLayout = computed(() => {
   flex-direction: column;
   min-height: 100vh; // Ensures the container takes up the full viewport height
 
-  $primary-color: #42b983;
-  background: linear-gradient(
-    135deg,
-    $primary-color,
-    #1a1f3c
-  ); /* Subtle gradient */
-
   .footer {
     position: fixed;
     bottom: 0;
@@ -61,5 +54,12 @@ const displayCenteredLayout = computed(() => {
 .centered-layout {
   justify-content: center;
   align-items: center;
+
+  $primary-color: #42b983;
+  background: linear-gradient(
+    135deg,
+    $primary-color,
+    #1a1f3c
+  ); /* Subtle gradient */
 }
 </style>
