@@ -23,14 +23,49 @@
   <div class="flex justify-content-between">
     <div class="flex-grow p-5 w-8">
       <div class="mb-5">
-        <h1 class="text-2xl font-bold">Investing</h1>
-        <p class="text-4xl font-bold mb-1">$7,920.90</p>
-        <p class="text-red-500 text-sm">▼ $158.65 (0.20%) Today</p>
+        <p class="text-2xl font-bold m-0 mb-2">Investing</p>
+        <p class="text-4xl font-bold mb-1 mt-1">{{ totalInvestment }}</p>
+        <p class="text-red-500 text-sm mt-0">{{ priceChange }}</p>
       </div>
+      <!-- Chart Area -->
+      <div
+        class="flex justify-content-center align-items-center flex-column border-2 border-dashed border-round h-12rem mb-2"
+      >
+        <Button
+          label="Enable Smart Trading Assistant"
+          class="p-button-outlined p-button-primary"
+        />
+      </div>
+      <!-- Buying Power -->
       <Accordion :activeIndex="0"
-        ><AccordionTab header="Buying Power"
-          ><p>test</p></AccordionTab
-        ></Accordion
+        ><AccordionTab>
+          <template #header>
+            <div class="flex justify-content-between align-items-center w-full">
+              <span>Buying Power</span>
+              <span class="text-right font-bold text-primary">{{ buyingPower }}</span>
+            </div>
+          </template>
+          <div class="flex flex-column gap-2">
+        <div class="flex justify-content-between">
+          <span>Available in Coinbase:</span>
+          <span class="font-bold">1000</span>
+        </div>
+        <div class="flex justify-content-between">
+          <span>Managed by Smart Trading Assistant:</span>
+          <span class="font-bold">-500</span>
+        </div>
+        <div class="flex justify-content-between border-top-1 pt-2 mt-2">
+          <span>Total:</span>
+          <span class="font-bold">500</span>
+        </div>
+        <Button
+          label="Deposit Funds"
+          class="mt-3 p-button-outlined p-button-success"
+          icon="pi pi-plus"
+          @click="depositFunds"
+        />
+      </div>
+        </AccordionTab></Accordion
       >
     </div>
     <div class="flex w-4 p-5">
@@ -57,10 +92,7 @@
             </p>
           </div>
         </li>
-        <li
-          v-if="!cryptocurrencies.length"
-          class="flex justify-content-center align-items-center slim-border"
-        >
+        <li class="flex justify-content-center align-items-center slim-border">
           <Button class="m-3">Get Started</Button>
         </li>
       </ul>
@@ -75,8 +107,6 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { isEmptyObject } from "@/helpers/Helpers";
-import { readAppData } from "@/helpers/ElectronHelper";
 import { Profile } from "main/models";
 import Button from "primevue/button";
 import { onMounted, ref } from "vue";
@@ -86,15 +116,26 @@ import AccordionTab from "primevue/accordiontab";
 import OnboardingModal from "@/components/dashboard/OnboardingModal.vue";
 import Message from "primevue/message";
 import { getProfile } from "@/helpers/appDataHelper";
+import { formatNumber } from "@/filters/FormatNumber";
 
 const displayOnboardingModal = ref<boolean>(false);
 const showSetupMessage = ref<boolean>(true);
 const profile = ref<Profile>();
 
+//AboveChart
+const totalInvestment = ref("0");
+const priceChange = ref("");
+
+//BelowChart
+const buyingPower = ref("0");
+
 const handleModalClose = () => {
   displayOnboardingModal.value = false;
+
+  setupDashboard();
 };
 
+//todo move to separate component
 const items = ref([
   {
     label: "Profiles",
@@ -112,16 +153,53 @@ const items = ref([
   },
 ]);
 
-const cryptocurrencies = ref([
-  { name: "Bitcoin", amount: "0.004", price: "$104,000", change: 0.04 },
-  { name: "Ethereum", amount: "1.2", price: "$3,200", change: -0.2 },
-  { name: "Cardano", amount: "320", price: "$1.50", change: 1.1 },
-]);
+const cryptocurrencies = ref([]);
 
 onMounted(async () => {
+  await setupDashboard();
+});
+
+const setupDashboard = async () => {
   profile.value = await getProfile("1");
   console.log(profile.value);
-});
+
+  setupCryptoDisplay();
+  organizeTotalInvestment();
+  organizePriceChange();
+  organizeBuyingPower();
+};
+
+const setupCryptoDisplay = (): void => {
+  profile.value.trackerConfig.whiteList.forEach((crypto) => {
+    cryptocurrencies.value.push({
+      name: crypto,
+      amount: "0.004",
+      price: "$104,000",
+      change: 0.04,
+    });
+  });
+};
+const organizeTotalInvestment = (): void => {
+  //todo incorporate ledger and tracker
+  totalInvestment.value = formatNumber(
+    profile.value.trackerConfig.initialDeposit,
+    { currency: true }
+  );
+};
+const organizePriceChange = () => {
+  const verbiage = "ICON PRICE (PERCENTAGE) Today";
+  priceChange.value = verbiage
+    .replace("ICON", "▼")
+    .replace("PRICE", formatNumber("20", { currency: true }))
+    .replace("PERCENTAGE", formatNumber("0.02", { percentage: true }));
+};
+const organizeChart = () => {
+  //organize chart for display
+};
+const organizeBuyingPower = () => {
+  //pull total from coinbase and subtract it from amount sitting in the fund.
+  buyingPower.value = formatNumber("500", {currency: true});
+}
 </script>
 
 <style lang="scss" scoped>
