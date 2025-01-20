@@ -72,7 +72,7 @@ export const createProfile = async (
     // Read the application data
     let appData = await readAppData();
 
-    if (!appData || isEmptyObject(appData)) {
+    if (isEmptyObject(appData)) {
       console.warn(
         "Empty or invalid AppData file detected. Initializing new app data."
       );
@@ -116,3 +116,52 @@ export const createProfile = async (
     throw error; // Propagate the error to the caller
   }
 };
+
+export async function getCoinbaseBalanceByProfileId(profileId: string): Promise<number> {
+    try {
+      // Fetch credentials for the given profile ID
+      const credentials = await getCredentialsByProfileId(profileId);
+
+      // Call the method on the window object
+      return await window.electronAPI.getCoinbaseBalance(credentials.apiKey, credentials.apisecret);
+    } catch (error) {
+      console.error(`Error fetching Coinbase balance for profile ID ${profileId}:`, error.message);
+      throw error;
+    }
+  }
+
+
+export async function getCredentialsByProfileId(profileId: string, platform: string = "coinbase"): Promise<Credential> {
+    try {
+      // Load the appData object
+      const appData = await readAppData();
+
+      if (isEmptyObject(appData)) {
+        throw new Error("Empty or invalid AppData file.");
+      }
+  
+      if (!Array.isArray(appData.profiles)) {
+        throw new Error("No profiles on appData object.");
+      }
+  
+      // Find the profile with the given ID
+      const profile = appData.profiles.find(p => p.id === profileId);
+  
+      if (!profile) {
+        throw new Error(`Profile with ID ${profileId} not found.`);
+      }
+
+      const credential = profile.credentials.find(c => c.platform="coinbase");
+
+      if (!credential) {
+        throw new Error(`Credentials for platform coinbase not found.`);
+      }
+  
+      // Return the credentials array
+      return credential;
+    } catch (error) {
+      console.error("Error fetching credentials:", error.message);
+      throw error; // Re-throw the error for upstream handling
+    }
+  }
+

@@ -8,5 +8,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   writeAppData: (data: AppData) => ipcRenderer.invoke('write-app-data', data),
   refreshApp: () => ipcRenderer.invoke('refresh-page'),
   openExternal: (url: string) => ipcRenderer.invoke('open-external-url', url),
-  validateCoinbaseCredentials: (apiKey: string, apiSecret: string) => ipcRenderer.invoke("coinbase-validate-credentials", apiKey, apiSecret)
+  validateCoinbaseCredentials: (apiKey: string, apiSecret: string) => ipcRenderer.invoke("coinbase-validate-credentials", apiKey, apiSecret),
+  getCoinbaseBalance: (apiKey: string, apiSecret: string) => ipcRenderer.invoke("coinbase-get-balance", apiKey, apiSecret)
 });
