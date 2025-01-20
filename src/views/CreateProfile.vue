@@ -87,15 +87,12 @@
 
 <script lang="ts" setup>
 import router from "@/router";
-import { readAppData, writeAppData } from "@/helpers/ElectronHelper";
-import { Profile } from "main/models";
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 import { computed, reactive, ref } from "vue";
 import Steps from "primevue/steps";
 import TextArea from "primevue/textarea";
 import Card from "primevue/card";
-import { isEmptyObject } from "@/helpers/Helpers";
 import { createProfile } from "@/helpers/appDataHelper";
 
 const isLoading = ref(false);
