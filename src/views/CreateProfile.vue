@@ -128,10 +128,9 @@ const CreateProfile = async () => {
   let newProfileId = 1;
 
   if (isEmptyObject(appData)) {
-    console.log("here");
     appData = { profiles: [] };
   } else {
-    newProfileId = ++appData.profiles.length
+    newProfileId = appData.profiles.length + 1;
   }
 
   const newProfile = {
