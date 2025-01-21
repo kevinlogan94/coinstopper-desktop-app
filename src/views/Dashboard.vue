@@ -41,32 +41,48 @@
         ><AccordionTab>
           <template #header>
             <div class="flex justify-content-between align-items-center w-full">
-              <span>Buying Power</span>
-              <span class="text-right font-bold text-primary">{{ buyingPower }}</span>
+              <div class="flex align-items-center">
+                <span>Buying Power</span>
+                <i
+                  class="ml-2 text-primary pi pi-info-circle"
+                  v-tooltip="
+                    'Buying Power represents the amount you can give to the trading assistant.'
+                  "
+                  style="cursor: pointer"
+                ></i>
+              </div>
+              <span class="text-right font-bold text-primary">{{
+                buyingPower
+              }}</span>
             </div>
           </template>
           <div class="flex flex-column gap-2">
-        <div class="flex justify-content-between">
-          <span>Available in Coinbase:</span>
-          <span class="font-bold">1000</span>
-        </div>
-        <div class="flex justify-content-between">
-          <span>Managed by Smart Trading Assistant:</span>
-          <span class="font-bold">-500</span>
-        </div>
-        <div class="flex justify-content-between border-top-1 pt-2 mt-2">
-          <span>Total:</span>
-          <span class="font-bold">500</span>
-        </div>
-        <Button
-          label="Deposit Funds"
-          class="mt-3 p-button-outlined p-button-success"
-          icon="pi pi-plus"
-          @click="depositFunds"
-        />
-      </div>
-        </AccordionTab></Accordion
-      >
+            <div class="flex justify-content-between">
+              <span>Available in Coinbase:</span>
+              <span class="font-bold">{{ coinbaseBalance }}</span>
+            </div>
+            <div class="flex justify-content-between">
+              <span>Managed by Smart Trading Assistant<i
+                  class="ml-1 text-primary pi pi-info-circle"
+                  v-tooltip="
+                    'These are funds that are invested or will be invested by the trading assistant'
+                  "
+                  style="cursor: pointer"
+                ></i> :</span>
+              <span class="font-bold">-{{ moneyManagedByAssistant }}</span>
+            </div>
+            <div class="flex justify-content-between border-top-1 pt-2 mt-2">
+              <span>Total:</span>
+              <span class="font-bold">{{ buyingPower }}</span>
+            </div>
+            <Button
+              label="Deposit Funds"
+              class="mt-3 p-button-outlined p-button-success"
+              icon="pi pi-plus"
+              @click=""
+            />
+          </div> </AccordionTab
+      ></Accordion>
     </div>
     <div class="flex w-4 p-5">
       <ul class="p-0 w-7">
@@ -115,7 +131,10 @@ import Accordion from "primevue/accordion";
 import AccordionTab from "primevue/accordiontab";
 import OnboardingModal from "@/components/dashboard/OnboardingModal.vue";
 import Message from "primevue/message";
-import { getProfile } from "@/helpers/appDataHelper";
+import {
+  getCoinbaseBalanceByProfileId,
+  getProfile,
+} from "@/helpers/appDataHelper";
 import { formatNumber } from "@/filters/FormatNumber";
 
 const displayOnboardingModal = ref<boolean>(false);
@@ -128,6 +147,8 @@ const priceChange = ref("");
 
 //BelowChart
 const buyingPower = ref("0");
+const coinbaseBalance = ref("0");
+const moneyManagedByAssistant = ref("0");
 
 const handleModalClose = () => {
   displayOnboardingModal.value = false;
@@ -161,8 +182,6 @@ onMounted(async () => {
 
 const setupDashboard = async () => {
   profile.value = await getProfile("1");
-  console.log(profile.value);
-
   setupCryptoDisplay();
   organizeTotalInvestment();
   organizePriceChange();
@@ -196,10 +215,24 @@ const organizePriceChange = () => {
 const organizeChart = () => {
   //organize chart for display
 };
-const organizeBuyingPower = () => {
+const organizeBuyingPower = async () => {
+  const rawCoinbaseBalance = await getCoinbaseBalanceByProfileId("1");
+  const InitialDeposit = profile.value.trackerConfig.initialDeposit;
+  let difference = rawCoinbaseBalance - InitialDeposit;
+
+  if (difference < 0) {
+    difference = 0;
+  }
+
   //pull total from coinbase and subtract it from amount sitting in the fund.
-  buyingPower.value = formatNumber("500", {currency: true});
-}
+  coinbaseBalance.value = formatNumber(rawCoinbaseBalance.toString(), {
+    currency: true,
+  });
+  moneyManagedByAssistant.value = formatNumber(InitialDeposit.toString(), {
+    currency: true,
+  });
+  buyingPower.value = formatNumber(difference, { currency: true });
+};
 </script>
 
 <style lang="scss" scoped>

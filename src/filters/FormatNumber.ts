@@ -7,7 +7,7 @@ export function formatNumber(
     format?: string
 ): string {
     // Handle default case for undefined, null, or 0
-    if (numberToFormat === null || numberToFormat === undefined || numberToFormat === 0) {
+    if (numberToFormat === null || numberToFormat === undefined) {
         return "0";
     }
 

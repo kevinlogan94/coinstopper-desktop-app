@@ -36,9 +36,11 @@ import 'primevue/resources/themes/arya-blue/theme.css'; // Theme
 import "primevue/resources/primevue.min.css"; // PrimeVue core styles
 import "primeicons/primeicons.css"; // PrimeIcons
 import "primeflex/primeflex.css"; // PrimeFlex (optional)
+import Tooltip from 'primevue/tooltip';
 
 
 const app = createApp(App)
+app.directive('tooltip', Tooltip)
 app.use(router)
 app.use(PrimeVue);
 app.mount('#app');
