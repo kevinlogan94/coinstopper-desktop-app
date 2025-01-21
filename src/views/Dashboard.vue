@@ -46,7 +46,7 @@
                 <i
                   class="ml-2 text-primary pi pi-info-circle"
                   v-tooltip="
-                    'Buying Power represents the amount you can give to the trading assistant.'
+                    'Buying Power represents the amount you can invest in the trading assistant.'
                   "
                   style="cursor: pointer"
                 ></i>
@@ -62,14 +62,14 @@
               <span class="font-bold">{{ coinbaseBalance }}</span>
             </div>
             <div class="flex justify-content-between">
-              <span>Managed by Smart Trading Assistant<i
+              <span>Held by Smart Trading Assistant<i
                   class="ml-1 text-primary pi pi-info-circle"
                   v-tooltip="
-                    'These are funds that are invested or will be invested by the trading assistant'
+                    'Funds for the trading assistance to invest for you.'
                   "
                   style="cursor: pointer"
                 ></i> :</span>
-              <span class="font-bold">-{{ moneyManagedByAssistant }}</span>
+              <span class="font-bold">-{{ moneyHeldByAssistant }}</span>
             </div>
             <div class="flex justify-content-between border-top-1 pt-2 mt-2">
               <span>Total:</span>
@@ -134,7 +134,7 @@ import Message from "primevue/message";
 import {
   getCoinbaseBalanceByProfileId,
   getProfile,
-} from "@/helpers/appDataHelper";
+} from "@/helpers/AppDataHelper";
 import { formatNumber } from "@/filters/FormatNumber";
 
 const displayOnboardingModal = ref<boolean>(false);
@@ -148,7 +148,7 @@ const priceChange = ref("");
 //BelowChart
 const buyingPower = ref("0");
 const coinbaseBalance = ref("0");
-const moneyManagedByAssistant = ref("0");
+const moneyHeldByAssistant = ref("0");
 
 const handleModalClose = () => {
   displayOnboardingModal.value = false;
@@ -228,7 +228,7 @@ const organizeBuyingPower = async () => {
   coinbaseBalance.value = formatNumber(rawCoinbaseBalance.toString(), {
     currency: true,
   });
-  moneyManagedByAssistant.value = formatNumber(InitialDeposit.toString(), {
+  moneyHeldByAssistant.value = formatNumber(InitialDeposit.toString(), {
     currency: true,
   });
   buyingPower.value = formatNumber(difference, { currency: true });

@@ -93,7 +93,7 @@ import { computed, reactive, ref } from "vue";
 import Steps from "primevue/steps";
 import TextArea from "primevue/textarea";
 import Card from "primevue/card";
-import { createProfile } from "@/helpers/appDataHelper";
+import { createProfile } from "@/helpers/AppDataHelper";
 
 const isLoading = ref(false);
 const testConnectionSuccessful = ref(false);
