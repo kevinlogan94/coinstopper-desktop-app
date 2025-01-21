@@ -41,7 +41,7 @@ export interface TrackerConfig {
   parameters?: Parameters; // Configuration for trading-specific parameters
 }
 
-interface Transaction {
+export interface Transaction {
   timestamp: string; // ISO 8601 timestamp for when the transaction occurred
   amount: number; // Money used in the transaction
   balance: number; // Total amount of money in the fund

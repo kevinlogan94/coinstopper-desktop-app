@@ -1,6 +1,6 @@
 import { readAppData, writeAppData } from "@/helpers/ElectronHelper";
 import { isEmptyObject } from "./Helpers";
-import { Profile, Credential } from "main/models";
+import { Profile, Credential, Transaction } from "main/models";
 
 export const updateProfile = async (
   profileId: string,
@@ -131,6 +131,20 @@ export async function getCoinbaseBalanceByProfileId(profileId: string): Promise<
   }
 
 
+  export async function getCoinbaseCryptoInvestmentInUSDByProfileId(profileId: string): Promise<number> {
+    try {
+      // Fetch credentials for the given profile ID
+      const credentials = await getCredentialsByProfileId(profileId);
+
+      // Call the method on the window object
+      return await window.electronAPI.getCryptoInvestmentInUSD(credentials.apiKey, credentials.apisecret);
+    } catch (error) {
+      console.error(`Error fetching Coinbase Crypto Investment in USD for profile ID ${profileId}:`, error.message);
+      throw error;
+    }
+  }
+
+
 export async function getCredentialsByProfileId(profileId: string, platform: string = "coinbase"): Promise<Credential> {
     try {
       // Load the appData object
@@ -151,7 +165,7 @@ export async function getCredentialsByProfileId(profileId: string, platform: str
         throw new Error(`Profile with ID ${profileId} not found.`);
       }
 
-      const credential = profile.credentials.find(c => c.platform="coinbase");
+      const credential = profile.credentials.find(c => c.platform=platform);
 
       if (!credential) {
         throw new Error(`Credentials for platform coinbase not found.`);
@@ -162,6 +176,34 @@ export async function getCredentialsByProfileId(profileId: string, platform: str
     } catch (error) {
       console.error("Error fetching credentials:", error.message);
       throw error; // Re-throw the error for upstream handling
+    }
+  }
+
+  export async function getLedgerByProfileId(profileId: string): Promise<Array<Transaction>> {
+    try {
+      // Load the appData object
+      const appData = await readAppData();
+  
+      if (isEmptyObject(appData)) {
+        throw new Error("Empty or invalid AppData file.");
+      }
+  
+      if (!Array.isArray(appData.profiles)) {
+        throw new Error("No profiles on appData object.");
+      }
+  
+      // Find the profile by its ID
+      const profile = appData.profiles.find((p) => p.id === profileId);
+  
+      if (!profile) {
+        throw new Error(`Profile with ID ${profileId} not found.`);
+      }
+  
+      // Return the ledger array
+      return profile.ledger;
+    } catch (error) {
+      console.error("Error fetching ledger by profile ID:", error.message);
+      throw error;
     }
   }
 
