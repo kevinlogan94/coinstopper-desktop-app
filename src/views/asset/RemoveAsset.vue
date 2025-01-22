@@ -63,7 +63,7 @@ import Steps from "primevue/steps";
 import Dropdown from "primevue/dropdown";
 import { useRouter } from "vue-router";
 import { getProfile, updateProfile } from "@/helpers/AppDataHelper";
-import { getAllCoinbaseCryptoByProfileId } from "@/helpers/CoinbaseHelper";
+import { getAllCoinbaseCryptoProductDataByProfileId } from "@/helpers/CoinbaseHelper";
 
 const props = defineProps<{ profileId: string; assetId: string }>();
 const router = useRouter();
@@ -92,7 +92,7 @@ const finalizeRemoval = () => {
 
 onMounted(async () => {
   const profile = await getProfile(props.profileId);
-  const allCryptos = await getAllCoinbaseCryptoByProfileId(props.profileId);
+  const allCryptos = await getAllCoinbaseCryptoProductDataByProfileId(props.profileId);
   const whitelist = profile.trackerConfig.whitelist;
   cryptoOptions.value = allCryptos.filter((asset) =>
     whitelist.includes(asset.product_id)

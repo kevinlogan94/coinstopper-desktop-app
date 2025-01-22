@@ -63,12 +63,10 @@ import Button from "primevue/button";
 import Card from "primevue/card";
 import Steps from "primevue/steps";
 import MultiSelect from "primevue/multiselect";
-import { useRouter } from "vue-router";
-import { getAllCoinbaseCryptoByProfileId } from "@/helpers/CoinbaseHelper";
-import { updateProfile } from "@/helpers/AppDataHelper";
+import { getAllCoinbaseCryptoProductDataByProfileId } from "@/helpers/CoinbaseHelper";
+import router from "@/router";
 
 const props = defineProps<{ profileId: string }>();
-const router = useRouter();
 
 const currentStep = ref(1);
 const selectedAssets = ref([]);
@@ -87,11 +85,15 @@ const finalizeAssets = () => {
 //   updateProfile(props.profileId, (profile) => {
 //     profile.trackerConfig.whiteList.push(...cryptoOptions.value);
 //   });
-  router.push({ name: "portfolio", params: { profileId: props.profileId } });
+  router.push({ name: "portfolio", params: { profileId: "12345" } });
 };
 
 onMounted(async () => {
-  cryptoOptions.value = await getAllCoinbaseCryptoByProfileId(props.profileId);
+    console.log(router.currentRoute.value);
+    
+    console.log(props.profileId);
+    
+  cryptoOptions.value = await getAllCoinbaseCryptoProductDataByProfileId(props.profileId);
 });
 </script>
 

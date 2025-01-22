@@ -16,7 +16,9 @@
     <div class="flex-grow p-5 w-8">
       <div class="mb-5">
         <p class="text-2xl font-bold m-0 mb-2">Investing</p>
-        <p class="text-4xl font-bold mb-1 mt-1">{{ totalInvestment }}</p>
+        <p class="text-4xl font-bold mb-1 mt-1" v-if="!isLoading">
+          {{ totalInvestment }}
+        </p>
         <p class="text-red-500 text-sm mt-0">{{ priceChange }}</p>
       </div>
       <!-- Chart Area -->
@@ -90,21 +92,25 @@
           class="flex justify-content-between text-sm slim-border p-1"
         >
           <div>
-            <p class="m-1">{{ currency.name }}</p>
-            <p class="m-1">{{ currency.amount }}</p>
+            <p class="m-1">{{ currency.currency }}</p>
+            <p class="m-1">{{ currency.balanceInCrypto }}</p>
           </div>
           <div>
-            <p class="m-1">{{ currency.price }}</p>
+            <p class="m-1">{{ formatNumber(currency.priceInUSD, {currency:true}) }}</p>
             <p
               class="m-1"
-              :class="currency.change > 0 ? 'text-green-500' : 'text-red-500'"
+              :class="
+                currency.priceChangePercentage24h > 0
+                  ? 'text-green-500'
+                  : 'text-red-500'
+              "
             >
-              {{ currency.change }}%
+              {{ currency.priceChangePercentage24h }}%
             </p>
           </div>
         </li>
         <li class="flex justify-content-center align-items-center slim-border">
-          <Button class="m-3">Get Started</Button>
+          <Button @click="goToAddAsset" class="m-3">Add</Button>
         </li>
       </ul>
     </div>
@@ -125,13 +131,20 @@ import Accordion from "primevue/accordion";
 import AccordionTab from "primevue/accordiontab";
 import OnboardingModal from "@/components/portfolio/OnboardingModal.vue";
 import Message from "primevue/message";
-import { getCoinbaseBalanceByProfileId } from "@/helpers/CoinbaseHelper";
+import {
+  getAllCoinbaseCryptoProductDataByProfileId,
+  getCoinbaseBalanceByProfileId,
+  getCoinbaseCryptoInvestmentInUSDByProfileId,
+  getCoinbaseCryptoProductDataByProfileId,
+} from "@/helpers/CoinbaseHelper";
 import { getProfile } from "@/helpers/AppDataHelper";
 import { formatNumber } from "@/filters/FormatNumber";
+import router from "@/router";
 
 const displayOnboardingModal = ref<boolean>(false);
 const showSetupMessage = ref<boolean>(true);
 const profile = ref<Profile>();
+const isLoading = ref<boolean>();
 
 //AboveChart
 const totalInvestment = ref("0");
@@ -145,7 +158,7 @@ const moneyHeldByAssistant = ref("0");
 //Right sidebar
 const cryptocurrencies = ref([]);
 
-defineProps<{ profileId: string }>();
+const props = defineProps<{ profileId: string }>();
 
 const handleModalClose = () => {
   displayOnboardingModal.value = false;
@@ -157,32 +170,39 @@ onMounted(async () => {
   await setupDashboard();
 });
 
-const setupDashboard = async () => {
-  profile.value = await getProfile("1");
+const goToAddAsset = () => {
+  router.push({ name: "addAsset", params: { profileId: props.profileId } });
+};
 
-  setupCryptoDisplay();
-  organizeTotalInvestment();
+const setupDashboard = async () => {
+  isLoading.value = true;
+
+  profile.value = await getProfile(props.profileId);
+
+  await setupCryptoDisplay();
+  await organizeTotalInvestment();
   organizePriceChange();
   organizeBuyingPower();
+  isLoading.value = false;
 };
 
 // Dashboard setup methods
-const setupCryptoDisplay = (): void => {
-  profile.value.trackerConfig.whiteList.forEach((crypto) => {
-    cryptocurrencies.value.push({
-      name: crypto,
-      amount: "0.004",
-      price: "$104,000",
-      change: 0.04,
-    });
+const setupCryptoDisplay = async (): Promise<void> => {
+  //we need to grab all crypto product data because we could have whitelisted something that we aren't invested in.
+  const result = await getAllCoinbaseCryptoProductDataByProfileId(props.profileId);
+
+  cryptocurrencies.value = result.filter((product) => {
+    if (profile.value.trackerConfig.whiteList.includes(product.currency)) {
+      return product;
+    }
   });
 };
-const organizeTotalInvestment = (): void => {
-  //todo incorporate ledger and tracker
-  totalInvestment.value = formatNumber(
-    profile.value.trackerConfig.initialDeposit,
-    { currency: true }
-  );
+const organizeTotalInvestment = async (): Promise<void> => {
+  const cryptoInvestmentInUSD =
+    await getCoinbaseCryptoInvestmentInUSDByProfileId(props.profileId);
+  totalInvestment.value = formatNumber(cryptoInvestmentInUSD, {
+    currency: true,
+  });
 };
 const organizePriceChange = () => {
   const verbiage = "ICON PRICE (PERCENTAGE) Today";
@@ -195,7 +215,9 @@ const organizeChart = () => {
   //organize chart for display
 };
 const organizeBuyingPower = async () => {
-  const rawCoinbaseBalance = await getCoinbaseBalanceByProfileId("1");
+  const rawCoinbaseBalance = await getCoinbaseBalanceByProfileId(
+    props.profileId
+  );
   const InitialDeposit = profile.value.trackerConfig.initialDeposit;
   let difference = rawCoinbaseBalance - InitialDeposit;
 
