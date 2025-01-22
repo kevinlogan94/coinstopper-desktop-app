@@ -1,12 +1,4 @@
 <template>
-  <Menubar :model="items">
-    <template #item="{ item, props, hasSubmenu }">
-      <a :href="item.url" :target="item.target" v-bind="props.action">
-        <span :class="item.icon" />
-        <span class="ml-2">{{ item.label }}</span>
-        <span v-if="hasSubmenu" class="pi pi-fw pi-angle-down ml-2" /> </a
-    ></template>
-  </Menubar>
   <Message v-if="showSetupMessage">
     <div class="flex align-items-center">
       <span
@@ -129,7 +121,6 @@
 import { Profile } from "main/models";
 import Button from "primevue/button";
 import { onMounted, ref } from "vue";
-import Menubar from "primevue/menubar";
 import Accordion from "primevue/accordion";
 import AccordionTab from "primevue/accordiontab";
 import OnboardingModal from "@/components/portfolio/OnboardingModal.vue";
@@ -151,6 +142,9 @@ const buyingPower = ref("0");
 const coinbaseBalance = ref("0");
 const moneyHeldByAssistant = ref("0");
 
+//Right sidebar
+const cryptocurrencies = ref([]);
+
 defineProps<{ profileId: string }>();
 
 const handleModalClose = () => {
@@ -158,26 +152,6 @@ const handleModalClose = () => {
 
   setupDashboard();
 };
-
-//todo move to separate component
-const items = ref([
-  {
-    label: "Profiles",
-    icon: "pi pi-user",
-    items: [
-      {
-        label: "Vue.js",
-        url: "https://vuejs.org/",
-      },
-      {
-        label: "Vite.js",
-        url: "https://vitejs.dev/",
-      },
-    ],
-  },
-]);
-
-const cryptocurrencies = ref([]);
 
 onMounted(async () => {
   await setupDashboard();
