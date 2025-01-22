@@ -5,7 +5,7 @@ import ProfileList from "@/views/profile/ProfileList.vue";
 import EditProfile from "@/views/profile/EditProfile.vue";
 import Portfolio from "@/views/Portfolio.vue";
 import AddAsset from "@/views/asset/AddAsset.vue";
-import EditAsset from "@/views/asset/EditAsset.vue";
+import ViewAsset from "@/views/asset/ViewAsset.vue";
 import RemoveAsset from "@/views/asset/RemoveAsset.vue";
 
 const routes: Array<RouteRecordRaw> = [
@@ -48,9 +48,9 @@ const routes: Array<RouteRecordRaw> = [
         component: AddAsset,
       },
       {
-        path: "asset/edit/:assetId",
-        name: "editAsset",
-        component: EditAsset,
+        path: "asset/view/:assetId",
+        name: "viewAsset",
+        component: ViewAsset,
         props: true, // Pass assetId as a prop to the component
       },
       {
