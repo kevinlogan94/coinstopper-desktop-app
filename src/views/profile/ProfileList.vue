@@ -41,12 +41,11 @@ const profiles = ref<Array<Profile>>([]);
 
 function SelectOrNewProfile(profile: Profile) {
   if (profile.name.includes("New Profile")) {
-    console.log("Create Profile");
-    router.push("CreateProfile");
+    router.push({ name: "createProfile" });
     return;
   }
-  console.log("Select Profile");
-  router.push("Dashboard");
+  console.log("profile selected:", profile.name);
+  router.push({ name: "portfolio", params: { profileId: profile.id } });
 }
 
 onMounted(async () => {

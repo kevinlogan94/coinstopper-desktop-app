@@ -1,8 +1,12 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
-import Dashboard from "../views/Dashboard.vue";
-import Welcome from "../views/Welcome.vue";
-import CreateProfile from "../views/CreateProfile.vue";
-import DisplayProfiles from "@/views/SelectProfiles.vue";
+import Welcome from "@/views/Welcome.vue";
+import CreateProfile from "@/views/profile/CreateProfile.vue";
+import ProfileList from "@/views/profile/ProfileList.vue";
+import EditProfile from "@/views/profile/EditProfile.vue";
+import Portfolio from "@/views/Portfolio.vue";
+import AddAsset from "@/views/asset/AddAsset.vue";
+import EditAsset from "@/views/asset/EditAsset.vue";
+import RemoveAsset from "@/views/asset/RemoveAsset.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -11,20 +15,52 @@ const routes: Array<RouteRecordRaw> = [
     component: Welcome,
   },
   {
-    path: "/createProfile",
-    name: "createProfile",
-    component: CreateProfile
+    path: "/profile",
+    name: "profile",
+    children: [
+      {
+        path: "list",
+        name: "profileList",
+        component: ProfileList,
+      },
+      {
+        path: "create",
+        name: "createProfile",
+        component: CreateProfile,
+      },
+      {
+        path: "edit/:profileId",
+        name: "editProfile",
+        component: EditProfile,
+        props: true, // Pass profileId as a prop to the component
+      },
+    ],
   },
   {
-    path: "/dashboard",
-    name: "Dashboard",
-    component: Dashboard,
+    path: "/portfolio/:profileId",
+    name: "portfolio",
+    component: Portfolio,
+    props: true, // Enable props to pass profileId to the component
+    children: [
+      {
+        path: "asset/add",
+        name: "addAsset",
+        component: AddAsset,
+      },
+      {
+        path: "asset/edit/:assetId",
+        name: "editAsset",
+        component: EditAsset,
+        props: true, // Pass assetId as a prop to the component
+      },
+      {
+        path: "asset/remove/:assetId",
+        name: "removeAsset",
+        component: RemoveAsset,
+        props: true, // Pass assetId as a prop to the component
+      },
+    ],
   },
-  {
-    path: "/selectProfile",
-    name: "selectProfile",
-    component: DisplayProfiles,
-  }
 ];
 
 const router = createRouter({

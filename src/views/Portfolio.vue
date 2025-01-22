@@ -133,6 +133,7 @@ import OnboardingModal from "@/components/dashboard/OnboardingModal.vue";
 import Message from "primevue/message";
 import {
   getCoinbaseBalanceByProfileId,
+  getCoinbaseCryptoInvestmentInUSDByProfileId,
   getProfile,
 } from "@/helpers/AppDataHelper";
 import { formatNumber } from "@/filters/FormatNumber";
@@ -149,6 +150,8 @@ const priceChange = ref("");
 const buyingPower = ref("0");
 const coinbaseBalance = ref("0");
 const moneyHeldByAssistant = ref("0");
+
+defineProps<{ profileId: string }>();
 
 const handleModalClose = () => {
   displayOnboardingModal.value = false;
@@ -182,12 +185,14 @@ onMounted(async () => {
 
 const setupDashboard = async () => {
   profile.value = await getProfile("1");
+
   setupCryptoDisplay();
   organizeTotalInvestment();
   organizePriceChange();
   organizeBuyingPower();
 };
 
+// Dashboard setup methods
 const setupCryptoDisplay = (): void => {
   profile.value.trackerConfig.whiteList.forEach((crypto) => {
     cryptocurrencies.value.push({

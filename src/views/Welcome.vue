@@ -35,13 +35,13 @@ onMounted(async () => {
   const appData = await readAppData();
   profiles.value = appData.profiles;
   if (profiles.value.length) {
-    router.push("SelectProfile");
+    router.push({name: "profileList"});
   }
   console.log(profiles.value);
 });
 
 const onCreateProfile = async (): Promise<void> => {
-  router.push("CreateProfile");
+  router.push({name: "createProfile"});
 };
 </script>
 

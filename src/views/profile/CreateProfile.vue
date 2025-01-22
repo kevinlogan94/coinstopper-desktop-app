@@ -140,14 +140,18 @@ const openExternalUrl = () => {
 };
 
 const CreateProfile = async () => {
-  await createProfile(formData.username, {
+  const newProfile = await createProfile(formData.username, {
     id: "1",
     platform: "coinbase",
     apiKey: formData.coinbaseApiKey,
     apisecret: formData.coinbaseApiSecret,
   });
 
-  router.push("Dashboard");
+  if (!newProfile) {
+    return;
+  }
+
+  router.push({name: "portfolio", params: { profileId: newProfile.id }});
 };
 </script>
 

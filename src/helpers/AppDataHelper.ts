@@ -61,7 +61,7 @@ export const getProfile = async (profileId: string): Promise<any> => {
 export const createProfile = async (
   name: string,
   credential: Credential
-): Promise<void> => {
+): Promise<Profile> => {
   try {
     if (!name || isEmptyObject(credential)) {
       throw new Error(
@@ -111,6 +111,8 @@ export const createProfile = async (
 
     // Write the updated data back to the file
     await writeAppData(appData);
+
+    return newProfile;
   } catch (error) {
     console.error("Error in createProfile:", error.message);
     throw error; // Propagate the error to the caller

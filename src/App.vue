@@ -33,7 +33,7 @@ const restartApp = async () => {
 };
 
 const displayCenteredLayout = computed(() => {
-  return router.currentRoute.value.name != "Dashboard";
+  return router.currentRoute.value.name != "portfolio";
 });
 </script>
 
