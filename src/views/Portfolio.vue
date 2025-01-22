@@ -62,13 +62,16 @@
               <span class="font-bold">{{ coinbaseBalance }}</span>
             </div>
             <div class="flex justify-content-between">
-              <span>Held by Smart Trading Assistant<i
+              <span
+                >Held by Smart Trading Assistant<i
                   class="ml-1 text-primary pi pi-info-circle"
                   v-tooltip="
                     'Funds for the trading assistance to invest for you.'
                   "
                   style="cursor: pointer"
-                ></i> :</span>
+                ></i>
+                :</span
+              >
               <span class="font-bold">-{{ moneyHeldByAssistant }}</span>
             </div>
             <div class="flex justify-content-between border-top-1 pt-2 mt-2">
@@ -129,13 +132,10 @@ import { onMounted, ref } from "vue";
 import Menubar from "primevue/menubar";
 import Accordion from "primevue/accordion";
 import AccordionTab from "primevue/accordiontab";
-import OnboardingModal from "@/components/dashboard/OnboardingModal.vue";
+import OnboardingModal from "@/components/portfolio/OnboardingModal.vue";
 import Message from "primevue/message";
-import {
-  getCoinbaseBalanceByProfileId,
-  getCoinbaseCryptoInvestmentInUSDByProfileId,
-  getProfile,
-} from "@/helpers/AppDataHelper";
+import { getCoinbaseBalanceByProfileId } from "@/helpers/CoinbaseHelper";
+import { getProfile } from "@/helpers/AppDataHelper";
 import { formatNumber } from "@/filters/FormatNumber";
 
 const displayOnboardingModal = ref<boolean>(false);
