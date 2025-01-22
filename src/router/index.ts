@@ -41,11 +41,17 @@ const routes: Array<RouteRecordRaw> = [
     name: "portfolio",
     component: Portfolio,
     props: true, // Enable props to pass profileId to the component
+  },
+  {
+    path: "/asset/:profileId",
+    name: "asset",
+    props: true, // Pass profileId as a prop to child routes
     children: [
       {
-        path: "asset/add",
+        path: "add",
         name: "addAsset",
         component: AddAsset,
+        props: true
       },
       {
         path: "asset/view/:assetId",
@@ -54,13 +60,13 @@ const routes: Array<RouteRecordRaw> = [
         props: true, // Pass assetId as a prop to the component
       },
       {
-        path: "asset/remove/:assetId",
+        path: "remove/:assetId",
         name: "removeAsset",
         component: RemoveAsset,
         props: true, // Pass assetId as a prop to the component
       },
     ],
-  },
+  }
 ];
 
 const router = createRouter({
