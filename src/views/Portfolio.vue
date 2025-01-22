@@ -96,7 +96,9 @@
             <p class="m-1">{{ currency.balanceInCrypto }}</p>
           </div>
           <div>
-            <p class="m-1">{{ formatNumber(currency.priceInUSD, {currency:true}) }}</p>
+            <p class="m-1">
+              {{ formatNumber(currency.priceInUSD, { currency: true }) }}
+            </p>
             <p
               class="m-1"
               :class="
@@ -188,14 +190,18 @@ const setupDashboard = async () => {
 
 // Dashboard setup methods
 const setupCryptoDisplay = async (): Promise<void> => {
-  //we need to grab all crypto product data because we could have whitelisted something that we aren't invested in.
-  const result = await getAllCoinbaseCryptoProductDataByProfileId(props.profileId);
+  if (profile.value?.trackerConfig?.whiteList?.length) {
+    //we need to grab all crypto product data because we could have whitelisted something that we aren't invested in.
+    const result = await getAllCoinbaseCryptoProductDataByProfileId(
+      props.profileId
+    );
 
-  cryptocurrencies.value = result.filter((product) => {
-    if (profile.value.trackerConfig.whiteList.includes(product.currency)) {
-      return product;
-    }
-  });
+    cryptocurrencies.value = result.filter((product) => {
+      if (profile.value.trackerConfig.whiteList.includes(product.currency)) {
+        return product;
+      }
+    });
+  }
 };
 const organizeTotalInvestment = async (): Promise<void> => {
   const cryptoInvestmentInUSD =
