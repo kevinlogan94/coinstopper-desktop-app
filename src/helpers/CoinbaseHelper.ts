@@ -1,7 +1,7 @@
 import { readAppData } from "@/helpers/ElectronHelper";
 import { isEmptyObject } from "./Helpers";
 import { Credential } from "main/models";
-import { CryptoSimple } from "main/services/coinbase";
+import { CryptoDetails } from "main/services/coinbase";
 
 
 export async function getCoinbaseBalanceByProfileId(profileId: string): Promise<number> {
@@ -31,7 +31,7 @@ export async function getCoinbaseBalanceByProfileId(profileId: string): Promise<
     }
   }
 
-  export async function getAllCoinbaseCryptoByProfileId(profileId: string): Promise<Array<CryptoSimple>> {
+  export async function getAllCoinbaseCryptoProductDataByProfileId(profileId: string): Promise<Array<CryptoDetails>> {
     try {
       // Fetch credentials for the given profile ID
       const credentials = await getCredentialsByProfileId(profileId);
@@ -40,6 +40,19 @@ export async function getCoinbaseBalanceByProfileId(profileId: string): Promise<
       return await window.electronAPI.getAllCoinbaseCrypto(credentials.apiKey, credentials.apisecret);
     } catch (error) {
       console.error(`Error fetching All Coinbase Crypto for profile ID ${profileId}:`, error.message);
+      throw error;
+    }
+  }
+
+  export async function getCoinbaseCryptoProductDataByProfileId(profileId: string): Promise<Array<CryptoDetails>> {
+    try {
+      // Fetch credentials for the given profile ID
+      const credentials = await getCredentialsByProfileId(profileId);
+
+      // Call the method on the window object
+      return await window.electronAPI.getCoinbaseCryptoProductData(credentials.apiKey, credentials.apisecret);
+    } catch (error) {
+      console.error(`Error fetching Crypto Product Data for profile ID ${profileId}:`, error.message);
       throw error;
     }
   }
