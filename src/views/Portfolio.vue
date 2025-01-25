@@ -191,17 +191,18 @@ const setupDashboard = async () => {
 
 // Dashboard setup methods
 const setupCryptoDisplay = async (): Promise<void> => {
-  if (profile.value?.trackerConfig?.whiteList?.length) {
-    //we need to grab all crypto product data because we could have whitelisted something that we aren't invested in.
+  const whiteList = profile.value?.trackerConfig?.whiteList;
+
+  if (whiteList?.length) {
+    // Fetch all crypto product data
     const result = await getAllCoinbaseCryptoProductDataByProfileId(
       props.profileId
     );
 
-    cryptocurrencies.value = result.filter((product) => {
-      if (profile.value.trackerConfig.whiteList.includes(product.currency)) {
-        return product;
-      }
-    });
+    // Filter to only include whitelisted products
+    cryptocurrencies.value = result.filter((product) =>
+      whiteList.includes(product.product_id)
+    );
   }
 };
 const organizeTotalInvestment = async (): Promise<void> => {
