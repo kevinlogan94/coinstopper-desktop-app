@@ -14,7 +14,7 @@
         <MultiSelect
           v-model="selectedAssets"
           :options="cryptoOptions"
-          optionLabel="base_name"
+          optionLabel="label"
           placeholder="Select Assets"
           filter
           class="w-full"
@@ -26,7 +26,7 @@
         <p>Review and finalize the assets to add to your portfolio:</p>
         <ul>
           <li v-for="asset in selectedAssets" :key="asset.product_id">
-            {{ asset.base_name }}
+            {{ asset.label }}
           </li>
         </ul>
       </div>
@@ -65,6 +65,7 @@ import Steps from "primevue/steps";
 import MultiSelect from "primevue/multiselect";
 import { getAllCoinbaseCryptoProductDataByProfileId } from "@/helpers/CoinbaseHelper";
 import router from "@/router";
+import { getProfile, updateProfile } from "@/helpers/AppDataHelper";
 
 const props = defineProps<{ profileId: string }>();
 
@@ -80,20 +81,25 @@ const goToStep = (step: number) => {
 };
 
 const finalizeAssets = () => {
-    console.log(cryptoOptions.value);
-    
-//   updateProfile(props.profileId, (profile) => {
-//     profile.trackerConfig.whiteList.push(...cryptoOptions.value);
-//   });
-  router.push({ name: "portfolio", params: { profileId: "12345" } });
+  const whiteListAdditions = selectedAssets.value.map(x => x.value);
+  console.log(whiteListAdditions);
+
+    updateProfile(props.profileId, (profile) => {
+      profile.trackerConfig.whiteList.push(...whiteListAdditions);
+    });
+  router.push({ name: "portfolio", params: { profileId: props.profileId } });
 };
 
 onMounted(async () => {
-    console.log(router.currentRoute.value);
-    
-    console.log(props.profileId);
-    
-  cryptoOptions.value = await getAllCoinbaseCryptoProductDataByProfileId(props.profileId);
+  const profile = await getProfile(props.profileId);
+  const whiteList = profile.trackerConfig.whiteList;
+
+  const allCryptoOptions = await getAllCoinbaseCryptoProductDataByProfileId(
+    props.profileId
+  );
+  cryptoOptions.value = allCryptoOptions
+    .filter((crypto) => !whiteList.includes(crypto.product_id))
+    .map((crypto) => ({ label: crypto.base_name, value: crypto.product_id }));
 });
 </script>
 
