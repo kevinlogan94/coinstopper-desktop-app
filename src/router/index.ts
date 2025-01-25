@@ -7,6 +7,7 @@ import Portfolio from "@/views/Portfolio.vue";
 import AddAsset from "@/views/asset/AddAsset.vue";
 import ViewAsset from "@/views/asset/ViewAsset.vue";
 import RemoveAsset from "@/views/asset/RemoveAsset.vue";
+import ManageFund from "@/views/ManageFund.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -66,6 +67,12 @@ const routes: Array<RouteRecordRaw> = [
         props: true, // Pass assetId as a prop to the component
       },
     ],
+  },
+  {
+    path: "/fund/:profileId/:action", // `action` will be either "add" or "remove"
+    name: "manageFund",
+    component: ManageFund, // A single component for both actions
+    props: true, // Pass `profileId` and `action` as props
   }
 ];
 

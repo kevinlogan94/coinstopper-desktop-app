@@ -89,6 +89,7 @@
         <li
           v-for="(currency, index) in cryptocurrencies"
           :key="index"
+          @click="goToViewAsset(currency.product_id)"
           class="flex justify-content-between text-sm slim-border p-1"
         >
           <div>
@@ -143,6 +144,7 @@ import {
 import { getProfile } from "@/helpers/AppDataHelper";
 import { formatNumber } from "@/filters/FormatNumber";
 import router from "@/router";
+import { getBuyingMetrics } from "@/helpers/Helpers";
 
 const displayOnboardingModal = ref<boolean>(false);
 const showSetupMessage = ref<boolean>(true);
@@ -175,6 +177,12 @@ onMounted(async () => {
 
 const goToAddAsset = () => {
   router.push({ name: "addAsset", params: { profileId: props.profileId } });
+};
+const goToViewAsset = (assetId: string) => {
+  router.push({
+    name: "viewAsset",
+    params: { profileId: props.profileId, assetId: assetId },
+  });
 };
 
 const setupDashboard = async () => {
@@ -223,24 +231,11 @@ const organizeChart = () => {
   //organize chart for display
 };
 const organizeBuyingPower = async () => {
-  const rawCoinbaseBalance = await getCoinbaseBalanceByProfileId(
-    props.profileId
-  );
-  const InitialDeposit = profile.value.trackerConfig.initialDeposit;
-  let difference = rawCoinbaseBalance - InitialDeposit;
+  var result = await getBuyingMetrics(props.profileId);
 
-  if (difference < 0) {
-    difference = 0;
-  }
-
-  //pull total from coinbase and subtract it from amount sitting in the fund.
-  coinbaseBalance.value = formatNumber(rawCoinbaseBalance.toString(), {
-    currency: true,
-  });
-  moneyHeldByAssistant.value = formatNumber(InitialDeposit.toString(), {
-    currency: true,
-  });
-  buyingPower.value = formatNumber(difference, { currency: true });
+  coinbaseBalance.value = result.coinbaseBalance;
+  moneyHeldByAssistant.value = result.moneyHeldByAssistant;
+  buyingPower.value = result.buyingPower;
 };
 </script>
 
