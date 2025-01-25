@@ -45,7 +45,7 @@ export function ConvertStringToNumber(string: string) {
   try {
     var convertedNumber = 0;
     if (typeof string === "string") {
-      convertedNumber = parseFloat(string.replace(/,/g, ""));
+      convertedNumber = parseFloat(string.replace(/[,$%]/g, ""));
       if (isNaN(convertedNumber)) throw new Error("Invalid number input");
     }
     return convertedNumber;

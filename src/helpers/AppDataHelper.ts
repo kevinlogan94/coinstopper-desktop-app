@@ -140,10 +140,40 @@ export const createProfile = async (
       }
   
       // Return the ledger array
-      return profile.ledger;
+      return profile.ledger ?? [];
     } catch (error) {
       console.error("Error fetching ledger by profile ID:", error.message);
       throw error;
     }
   }
+
+  export const addToLedger = async (profileId: string, entry: Transaction): Promise<void> => {
+    try {
+      // Load the appData object
+      const appData = await readAppData();
+  
+      if (!appData || !Array.isArray(appData.profiles)) {
+        throw new Error("Invalid app data structure.");
+      }
+  
+      // Find the profile by profileId
+      const profile = appData.profiles.find((p) => p.id === profileId);
+  
+      if (!profile) {
+        throw new Error(`Profile with ID ${profileId} not found.`);
+      }
+  
+      // Add the new entry to the ledger
+      profile.ledger = profile.ledger ?? [];
+      profile.ledger.push(entry);
+  
+      // Save the updated appData
+      await writeAppData(appData);
+  
+      console.log(`Added new ledger entry for profile ID ${profileId}`);
+    } catch (error) {
+      console.error("Error adding to ledger:", error.message);
+      throw error;
+    }
+  };
 

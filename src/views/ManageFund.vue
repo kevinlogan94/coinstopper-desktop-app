@@ -85,6 +85,8 @@ import InputNumber from "primevue/inputnumber";
 import router from "@/router";
 import { ConvertStringToNumber, formatNumber } from "@/filters/FormatNumber";
 import { getBuyingMetrics } from "@/helpers/Helpers";
+import { addToLedger, getLedgerByProfileId } from "@/helpers/AppDataHelper";
+import { Transaction } from "main/models";
 
 const props = defineProps<{ profileId: string; action: "add" | "remove" }>();
 
@@ -103,12 +105,12 @@ const goToStep = (step: number) => {
 };
 
 const finalize = () => {
-  // Mocked finalize action - Normally you would call an API here
   console.log(
     `${props.action === "add" ? "Added" : "Removed"} ${
       amount.value
     } to/from profile ${props.profileId}`
   );
+  AddActionToLedger(amount.value, props.action === "add" ? "deposit" : "withdraw")
   router.push({ name: "portfolio", params: { profileId: props.profileId } });
 };
 
@@ -125,6 +127,24 @@ onMounted(async () => {
     buyingMetrics.moneyHeldByAssistant
   );
 });
+
+const AddActionToLedger = async (amount: number, action: "deposit" | "withdraw"): Promise<void> => {
+  const ledger = await getLedgerByProfileId(props.profileId);
+  const balance = ledger[ledger.length - 1]?.balance || 0; // Default to 0 if the ledger is empty
+
+  const isDeposit = action === "deposit";
+
+  const ledgerAddition: Transaction = {
+    timestamp: new Date().toISOString(), // Use ISO format for timestamps
+    amount: isDeposit ? amount : -amount, // Negative for deposits, positive for withdrawals
+    symbol: "N/A", // Default symbol
+    description: isDeposit ? "Deposit" : "Withdraw", // Description based on action
+    balance: isDeposit ? balance + amount : balance - amount, // Adjust balance based on action
+  };
+
+  await addToLedger(props.profileId, ledgerAddition);
+};
+
 </script>
 
 <style scoped>

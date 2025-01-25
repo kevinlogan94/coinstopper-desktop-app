@@ -76,7 +76,7 @@
               label="Deposit Funds"
               class="mt-3 p-button-outlined p-button-success"
               icon="pi pi-plus"
-              @click=""
+              @click="goToAddFund"
             />
           </div> </AccordionTab
       ></Accordion>
@@ -183,6 +183,18 @@ const goToViewAsset = (assetId: string) => {
     params: { profileId: props.profileId, assetId: assetId },
   });
 };
+const goToAddFund = () => {
+  router.push({
+    name: "manageFund",
+    params: { profileId: props.profileId, action: "add" },
+  });
+}
+const goToRemoveFund = () => {
+  router.push({
+    name: "manageFund",
+    params: { profileId: props.profileId, action: "remove" },
+  });
+}
 
 const setupDashboard = async () => {
   isLoading.value = true;
