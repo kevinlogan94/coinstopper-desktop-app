@@ -6,6 +6,7 @@
     header="Welcome to Your Portfolio"
     class="w-7"
     @hide="closeModal"
+    @show="setupModal"
   >
     <!-- Step 1: Choose Cryptocurrency -->
     <Card v-if="currentStep === 1" class="modal-card">
@@ -142,6 +143,7 @@ import Dialog from "primevue/dialog";
 import Steps from "primevue/steps";
 import { updateProfile } from "@/helpers/AppDataHelper";
 import { Profile } from "main/models";
+import { getAllCoinbaseCryptoProductDataByProfileId } from "@/helpers/CoinbaseHelper";
 
 const props = defineProps({
   visible: {
@@ -152,6 +154,9 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
+  profileId: {
+    type: String
+  }
 });
 
 const emits = defineEmits(["close", "setupCompleted"]);
@@ -161,12 +166,7 @@ const selectedCrypto = ref<{ label: string; value: string }>(null);
 const investmentAmount = ref(0);
 const enableTracker = ref(false);
 const stepComponentStep = computed(() => currentStep.value - 1);
-
-const cryptoOptions = [
-  { label: "Bitcoin", value: "BTC" },
-  { label: "Ethereum", value: "ETH" },
-  { label: "Litecoin", value: "LTC" },
-];
+const cryptoOptions = ref([]);
 
 const steps = [
   { label: "Choose Crypto" },
@@ -180,7 +180,7 @@ const goToStep = (step: number) => {
 };
 
 const finishSetup = async () => {
-  updateProfile("1", (profile: Profile) => {
+  updateProfile(props.profileId, (profile: Profile) => {
     profile.appConfig.trackerEnabled = enableTracker.value;
     profile.trackerConfig.initialDeposit = investmentAmount.value;
     profile.trackerConfig.whiteList = [selectedCrypto.value.value];
@@ -188,6 +188,15 @@ const finishSetup = async () => {
 
   closeModal();
 };
+
+const setupModal = async () => {
+  organizeCryptoOptions();
+}
+
+const organizeCryptoOptions = async () => {
+  const crypto = await getAllCoinbaseCryptoProductDataByProfileId(props.profileId)
+  cryptoOptions.value = crypto.map(c => ({label: c.base_name, value: c.product_id}))
+}
 
 const closeModal = () => {
   emits("close");

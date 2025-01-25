@@ -120,6 +120,7 @@
       v-if="displayOnboardingModal"
       :visible="displayOnboardingModal"
       :currentPrice="1000"
+      :profile-id="profileId"
       @close="handleModalClose"
       @setupCompleted="handleModalClose"
     />

@@ -33,7 +33,7 @@ export const updateProfile = async (
   }
 };
 
-export const getProfile = async (profileId: string): Promise<any> => {
+export const getProfile = async (profileId: string): Promise<Profile> => {
   try {
     // Read the application data
     const appData = await readAppData();
