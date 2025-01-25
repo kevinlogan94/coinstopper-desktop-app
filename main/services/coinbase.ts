@@ -154,12 +154,12 @@ ipcMain.handle(
 );
 
 export interface CryptoDetails {
-  product_id: string;
-  base_name: string;
-  currency: string;
-  balanceInCrypto: number;
-  priceInUSD: number;
-  priceChangePercentage24h: number;
+  product_id: string; // ex: BTC-USD
+  base_name: string; // Plain english name of the crypto: Bitcoin
+  currency: string; // The name of the currency: BTC
+  balanceInCrypto: number; // How much of the crypto that I'm invested in currently. ex: 0.012
+  priceInUSD: number; // The cost to purchase the crypto in US Dollars
+  priceChangePercentage24h: number; // How much the price has changed in 24h
 }
 
 ipcMain.handle(

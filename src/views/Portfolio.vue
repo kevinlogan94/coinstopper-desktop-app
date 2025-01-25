@@ -139,7 +139,6 @@ import {
   getAllCoinbaseCryptoProductDataByProfileId,
   getCoinbaseBalanceByProfileId,
   getCoinbaseCryptoInvestmentInUSDByProfileId,
-  getCoinbaseCryptoProductDataByProfileId,
 } from "@/helpers/CoinbaseHelper";
 import { getProfile } from "@/helpers/AppDataHelper";
 import { formatNumber } from "@/filters/FormatNumber";
