@@ -49,7 +49,7 @@ import Card from "primevue/card";
 import Button from "primevue/button";
 import TransactionList from "@/components/portfolio/TransactionList.vue";
 import router from "@/router";
-import { getCoinbaseCryptoProductDataByProfileId } from "@/helpers/CoinbaseHelper";
+import { getAllCoinbaseCryptoProductDataByProfileId } from "@/helpers/CoinbaseHelper";
 import { getLedgerByProfileId } from "@/helpers/AppDataHelper";
 import { Transaction } from "main/models";
 import { formatNumber } from "@/filters/FormatNumber";
@@ -75,10 +75,10 @@ const goToRemoveAsset = () => {
 };
 
 onMounted(async () => {
-  const investedAssets = await getCoinbaseCryptoProductDataByProfileId(
+  const allAvailableCrypto = await getAllCoinbaseCryptoProductDataByProfileId(
     props.profileId
   );
-  const asset = investedAssets.find((a) => a.product_id === props.assetId);
+  const asset = allAvailableCrypto.find((a) => a.product_id === props.assetId);
 
   if (asset) {
     assetName.value = asset.base_name;
@@ -88,6 +88,8 @@ onMounted(async () => {
     // roi.value = asset.roi;
     // netProfitLoss.value = asset.net_profit_loss;
     // averageBuyPrice.value = asset.average_buy_price;
+  } else {
+    console.error("Missing Asset");
   }
   
   await organizeTrasactions();

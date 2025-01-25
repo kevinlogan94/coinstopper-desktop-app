@@ -80,13 +80,12 @@ const goToStep = (step: number) => {
   currentStep.value = step;
 };
 
-const finalizeAssets = () => {
-  const whiteListAdditions = selectedAssets.value.map(x => x.value);
-  console.log(whiteListAdditions);
+const finalizeAssets = async () => {
+  const whiteListAdditions = selectedAssets.value.map((x) => x.value);
 
-    updateProfile(props.profileId, (profile) => {
-      profile.trackerConfig.whiteList.push(...whiteListAdditions);
-    });
+  await updateProfile(props.profileId, (profile) => {
+    profile.trackerConfig.whiteList.push(...whiteListAdditions);
+  });
   router.push({ name: "portfolio", params: { profileId: props.profileId } });
 };
 
