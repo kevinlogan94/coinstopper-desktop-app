@@ -25,10 +25,10 @@
       <div
         class="flex justify-content-center align-items-center flex-column border-2 border-dashed border-round h-12rem mb-2"
       >
-        <Button
+        <!-- <Button
           label="Enable Smart Trading Assistant"
           class="p-button-outlined p-button-primary"
-        />
+        /> -->
       </div>
       <!-- Buying Power -->
       <Accordion :activeIndex="0"
@@ -74,10 +74,18 @@
             </div>
             <Button
               label="Deposit Funds"
-              class="mt-3 p-button-outlined p-button-success"
+              severity="success"
+              class="mt-3 p-button-outlined"
               icon="pi pi-plus"
+              :disabled="buyingPower.includes('0.00')"
               @click="goToAddFund"
             />
+            <Button  label="Remove Funds"
+              class="mt-3 p-button-outlined"
+              severity="danger"
+              icon="pi pi-minus"
+              :disabled="moneyHeldByAssistant.includes('0.00')"
+              @click="goToRemoveFund"></Button>
           </div> </AccordionTab
       ></Accordion>
     </div>

@@ -1,5 +1,5 @@
 import { formatNumber } from "@/filters/FormatNumber";
-import { getProfile } from "./AppDataHelper";
+import { getBalanceHeldByAssistentByProfileId, getProfile } from "./AppDataHelper";
 import { getCoinbaseBalanceByProfileId } from "./CoinbaseHelper";
 
 export const isEmptyObject = (obj: object): boolean => {
@@ -9,27 +9,47 @@ export const isEmptyObject = (obj: object): boolean => {
   );
 };
 
-export const getBuyingMetrics = async (
-  profileId: string
-): Promise<{
+export interface BuyingMetrics {
   coinbaseBalance: string;
   moneyHeldByAssistant: string;
   buyingPower: string;
-}> => {
+}
+export interface RawBuyingMetrics {
+  coinbaseBalance: number;
+  moneyHeldByAssistant: number;
+  buyingPower: number;
+}
+
+export const getBuyingMetrics = async (
+  profileId: string
+): Promise<BuyingMetrics> => {
+  const RawBuyingMetrics = await getRawBuyingMetrics(profileId)
+
+  // Return formatted values
+  return {
+    coinbaseBalance: formatNumber(RawBuyingMetrics.coinbaseBalance, { currency: true }),
+    moneyHeldByAssistant: formatNumber(RawBuyingMetrics.moneyHeldByAssistant, { currency: true }),
+    buyingPower: formatNumber(RawBuyingMetrics.buyingPower, { currency: true }),
+  };
+};
+
+export const getRawBuyingMetrics = async (
+  profileId: string
+): Promise<RawBuyingMetrics> => {
   const profile = await getProfile(profileId);
 
   // Fetch raw balances
   const rawCoinbaseBalance = await getCoinbaseBalanceByProfileId(profileId);
-  const balanceHeldByAssistant = profile.trackerConfig.initialDeposit; //Todo: Need more data
+  const balanceHeldByAssistant = await getBalanceHeldByAssistentByProfileId(profileId);
 
   // Calculate buying power - Make sure we don't get a number below 0.
   const difference = Math.max(rawCoinbaseBalance - balanceHeldByAssistant, 0);
 
   // Return formatted values
   return {
-    coinbaseBalance: formatNumber(rawCoinbaseBalance, { currency: true }),
-    moneyHeldByAssistant: formatNumber(balanceHeldByAssistant, { currency: true }),
-    buyingPower: formatNumber(difference, { currency: true }),
+    coinbaseBalance: rawCoinbaseBalance,
+    moneyHeldByAssistant: balanceHeldByAssistant,
+    buyingPower: difference
   };
 };
 

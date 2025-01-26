@@ -1,7 +1,7 @@
 <template>
   <Card class="manage-fund">
     <template #title>
-      Manage Fund - {{ action === "add" ? "Add Funds" : "Remove Funds" }}
+      {{ action === "add" ? "Add Funds" : "Remove Funds" }}
     </template>
 
     <template #content>
@@ -45,6 +45,20 @@
           }}
           <strong>{{ formatNumber(amount, { currency: true }) }}</strong>
         </p>
+        <p>
+          {{
+            action === "add"
+              ? "With this change, your smart assistant will have "
+              : "With this change, your buying power will be "
+          }}
+          <strong>{{
+            action === "add"
+              ? formatNumber(balanceHeldByAssistant + amount, {
+                  currency: true,
+                })
+              : formatNumber(newBuyingPower, { currency: true })
+          }}</strong>
+        </p>
         <p>Do you want to proceed?</p>
       </div>
     </template>
@@ -84,7 +98,11 @@ import Steps from "primevue/steps";
 import InputNumber from "primevue/inputnumber";
 import router from "@/router";
 import { ConvertStringToNumber, formatNumber } from "@/filters/FormatNumber";
-import { getBuyingMetrics } from "@/helpers/Helpers";
+import {
+  getBuyingMetrics,
+  getRawBuyingMetrics,
+  RawBuyingMetrics,
+} from "@/helpers/Helpers";
 import { addToLedger, getLedgerByProfileId } from "@/helpers/AppDataHelper";
 import { Transaction } from "main/models";
 
@@ -94,6 +112,7 @@ const currentStep = ref(0);
 const amount = ref<number | null>(null);
 const buyingPower = ref(0);
 const balanceHeldByAssistant = ref(0);
+const rawBuyingMetrics = ref<RawBuyingMetrics>();
 
 const steps = [
   { label: props.action === "add" ? "Add Funds" : "Remove Funds" },
@@ -104,13 +123,24 @@ const goToStep = (step: number) => {
   currentStep.value = step;
 };
 
+const newBuyingPower = computed(() => {
+  return Math.max(
+    rawBuyingMetrics.value.coinbaseBalance -
+      (rawBuyingMetrics.value.moneyHeldByAssistant - amount.value),
+    0
+  );
+});
+
 const finalize = () => {
   console.log(
     `${props.action === "add" ? "Added" : "Removed"} ${
       amount.value
     } to/from profile ${props.profileId}`
   );
-  AddActionToLedger(amount.value, props.action === "add" ? "deposit" : "withdraw")
+  AddActionToLedger(
+    amount.value,
+    props.action === "add" ? "deposit" : "withdraw"
+  );
   router.push({ name: "portfolio", params: { profileId: props.profileId } });
 };
 
@@ -126,9 +156,15 @@ onMounted(async () => {
   balanceHeldByAssistant.value = ConvertStringToNumber(
     buyingMetrics.moneyHeldByAssistant
   );
+  if (props.action === "remove") {
+    rawBuyingMetrics.value = await getRawBuyingMetrics(props.profileId);
+  }
 });
 
-const AddActionToLedger = async (amount: number, action: "deposit" | "withdraw"): Promise<void> => {
+const AddActionToLedger = async (
+  amount: number,
+  action: "deposit" | "withdraw"
+): Promise<void> => {
   const ledger = await getLedgerByProfileId(props.profileId);
   const balance = ledger[ledger.length - 1]?.balance || 0; // Default to 0 if the ledger is empty
 
@@ -144,7 +180,6 @@ const AddActionToLedger = async (amount: number, action: "deposit" | "withdraw")
 
   await addToLedger(props.profileId, ledgerAddition);
 };
-
 </script>
 
 <style scoped>
