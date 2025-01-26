@@ -1,10 +1,12 @@
 <template>
-  <div class="display-profiles flex flex-column align-items-center">
+  <div class="profile-list flex flex-column align-items-center">
     <h2 v-if="profiles.length" class="text-center text-white text-xl mb-4">
       Profiles
     </h2>
 
-    <div class="flex align-items-center justify-content-center flex-wrap gap-7">
+    <div
+      class="profiles flex align-items-center justify-content-center flex-wrap gap-7"
+    >
       <div
         v-for="profile in profiles"
         :key="profile.id"
@@ -19,10 +21,20 @@
             aria-label="add profile"
             :icon="profile.icon"
           ></Button>
+          <i
+            v-if="isEditing && profile.id !== '999'"
+            class="pi-pencil pi pencil-icon absolute bottom-0 right-0"
+          ></i>
         </div>
         <span class="text-white font-bold">{{ profile.name }}</span>
       </div>
     </div>
+    <Button
+      :label="isEditing ? 'Done' : 'Edit'"
+      class="mt-4 edit-button"
+      severity="secondary"
+      @click="toggleEdit"
+    />
   </div>
 </template>
 
@@ -38,14 +50,22 @@ interface Profile {
   icon: string;
 }
 const profiles = ref<Array<Profile>>([]);
+const isEditing = ref(false);
 
 function SelectOrNewProfile(profile: Profile) {
   if (profile.name.includes("New Profile")) {
     router.push({ name: "createProfile" });
     return;
   }
-  console.log("profile selected:", profile.name);
+  if (isEditing) {
+    router.push({ name: "editProfile", params: { profileId: profile.id } });
+    return
+  }
   router.push({ name: "portfolio", params: { profileId: profile.id } });
+}
+
+function toggleEdit() {
+  isEditing.value = !isEditing.value;
 }
 
 onMounted(async () => {
@@ -73,18 +93,25 @@ $profile-width-height: 6rem;
   height: $profile-width-height;
 }
 
-.display-profiles {
+.profile-list {
   margin-bottom: 300px;
 }
 </style>
 
 <style lang="scss">
-.display-profiles {
+.profiles {
   .p-button-label {
     display: none;
   }
   .pi {
     font-size: 2rem;
+  }
+  .pencil-icon {
+    font-size: 1rem;
+    color: white;
+    background-color: black;
+    border-radius: 50%;
+    padding: 0.5rem;
   }
 }
 </style>
