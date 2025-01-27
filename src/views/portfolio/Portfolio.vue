@@ -14,12 +14,26 @@
   </Message>
   <div class="flex justify-content-between">
     <div class="flex-grow p-5 w-8">
-      <div class="mb-5">
-        <p class="text-2xl font-bold m-0 mb-2">Investing</p>
-        <p class="text-4xl font-bold mb-1 mt-1" v-if="!isLoading">
-          {{ totalInvestment }}
-        </p>
-        <p class="text-red-500 text-sm mt-0">{{ priceChange }}</p>
+      <div class="mb-5 flex justify-content-between">
+        <div>
+          <p class="text-2xl font-bold m-0 mb-2">Investing</p>
+          <p class="text-4xl font-bold mb-1 mt-1" v-if="!isLoading">
+            {{ totalInvestment }}
+          </p>
+          <p class="text-red-500 text-sm mt-0">{{ priceChange }}</p>
+        </div>
+        <div>
+          <Button
+            label="Trading Assistant"
+            :icon="
+              profile?.appConfig?.trackerEnabled ? 'pi pi-play' : 'pi pi-pause'
+            "
+            :severity="
+              profile?.appConfig?.trackerEnabled ? 'success' : 'warning'
+            "
+            @click="toggleTradingAssistant"
+          ></Button>
+        </div>
       </div>
       <!-- Chart Area -->
       <div
@@ -80,17 +94,19 @@
               :disabled="buyingPower.includes('0.00')"
               @click="goToAddFund"
             />
-            <Button  label="Remove Funds"
+            <Button
+              label="Remove Funds"
               class="mt-3 p-button-outlined"
               severity="danger"
               icon="pi pi-minus"
               :disabled="moneyHeldByAssistant.includes('0.00')"
-              @click="goToRemoveFund"></Button>
+              @click="goToRemoveFund"
+            ></Button>
           </div> </AccordionTab
       ></Accordion>
     </div>
     <div class="flex w-4 p-5">
-      <ul class="p-0 w-7">
+      <ul class="p-0 w-7 m-0">
         <li class="flex p-1 slim-border">
           <p class="m-1">Cryptocurrencies</p>
         </li>
@@ -145,10 +161,9 @@ import OnboardingModal from "@/components/portfolio/OnboardingModal.vue";
 import Message from "primevue/message";
 import {
   getAllCoinbaseCryptoProductDataByProfileId,
-  getCoinbaseBalanceByProfileId,
   getCoinbaseCryptoInvestmentInUSDByProfileId,
 } from "@/helpers/CoinbaseHelper";
-import { getProfile } from "@/helpers/AppDataHelper";
+import { getProfile, updateProfile } from "@/helpers/AppDataHelper";
 import { formatNumber } from "@/filters/FormatNumber";
 import router from "@/router";
 import { getBuyingMetrics } from "@/helpers/Helpers";
@@ -175,36 +190,14 @@ const props = defineProps<{ profileId: string }>();
 const handleModalClose = () => {
   displayOnboardingModal.value = false;
 
-  setupDashboard();
+  setupPortfolio();
 };
 
 onMounted(async () => {
-  await setupDashboard();
+  await setupPortfolio();
 });
 
-const goToAddAsset = () => {
-  router.push({ name: "addAsset", params: { profileId: props.profileId } });
-};
-const goToViewAsset = (assetId: string) => {
-  router.push({
-    name: "viewAsset",
-    params: { profileId: props.profileId, assetId: assetId },
-  });
-};
-const goToAddFund = () => {
-  router.push({
-    name: "manageFund",
-    params: { profileId: props.profileId, action: "add" },
-  });
-}
-const goToRemoveFund = () => {
-  router.push({
-    name: "manageFund",
-    params: { profileId: props.profileId, action: "remove" },
-  });
-}
-
-const setupDashboard = async () => {
+const setupPortfolio = async () => {
   isLoading.value = true;
 
   profile.value = await getProfile(props.profileId);
@@ -216,7 +209,7 @@ const setupDashboard = async () => {
   isLoading.value = false;
 };
 
-// Dashboard setup methods
+// Portfolio setup methods
 const setupCryptoDisplay = async (): Promise<void> => {
   const whiteList = profile.value?.trackerConfig?.whiteList;
 
@@ -255,6 +248,36 @@ const organizeBuyingPower = async () => {
   coinbaseBalance.value = result.coinbaseBalance;
   moneyHeldByAssistant.value = result.moneyHeldByAssistant;
   buyingPower.value = result.buyingPower;
+};
+
+const toggleTradingAssistant = async () => {
+  await updateProfile(props.profileId, profile => {
+    profile.appConfig.trackerEnabled = !profile.appConfig.trackerEnabled;
+  });
+  profile.value = await getProfile(props.profileId);
+}
+
+// Router methods
+const goToAddAsset = () => {
+  router.push({ name: "addAsset", params: { profileId: props.profileId } });
+};
+const goToViewAsset = (assetId: string) => {
+  router.push({
+    name: "viewAsset",
+    params: { profileId: props.profileId, assetId: assetId },
+  });
+};
+const goToAddFund = () => {
+  router.push({
+    name: "manageFund",
+    params: { profileId: props.profileId, action: "add" },
+  });
+};
+const goToRemoveFund = () => {
+  router.push({
+    name: "manageFund",
+    params: { profileId: props.profileId, action: "remove" },
+  });
 };
 </script>
 

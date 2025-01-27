@@ -3,11 +3,11 @@ import Welcome from "@/views/Welcome.vue";
 import CreateProfile from "@/views/profile/CreateProfile.vue";
 import ProfileList from "@/views/profile/ProfileList.vue";
 import EditProfile from "@/views/profile/EditProfile.vue";
-import Portfolio from "@/views/Portfolio.vue";
+import Portfolio from "@/views/portfolio/Portfolio.vue";
 import AddAsset from "@/views/asset/AddAsset.vue";
 import ViewAsset from "@/views/asset/ViewAsset.vue";
 import RemoveAsset from "@/views/asset/RemoveAsset.vue";
-import ManageFund from "@/views/ManageFund.vue";
+import ManageFund from "@/views/portfolio/ManageFund.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
