@@ -15,6 +15,7 @@
               v-model="formData.username"
               id="username"
               class="w-full"
+              maxlength="12"
               required
               placeholder="Enter your username"
             />
@@ -34,6 +35,7 @@
             <label for="coinbaseApiSecret" class="block"
               >Coinbase Api Secret</label
             >
+            <!-- TODO: Change this to be a password component -->
             <TextArea
               v-model="formData.coinbaseApiSecret"
               placeholder="-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEIC1+v8K9Q98Y7J2N1l5Q8J3K5G8Y7Jsdf2N1l5Y7J2N1gfl5J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N1l5Q8J3K5G8Y7J2N\n-----END EC PRIVATE KEY-----\n"

@@ -57,7 +57,7 @@ function SelectOrNewProfile(profile: Profile) {
     router.push({ name: "createProfile" });
     return;
   }
-  if (isEditing) {
+  if (isEditing.value) {
     router.push({ name: "editProfile", params: { profileId: profile.id } });
     return
   }
