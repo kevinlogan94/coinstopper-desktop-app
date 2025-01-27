@@ -12,6 +12,8 @@ interface Window {
         getCoinbaseBalance: (apiKey: string, apiSecret: string) => Promise<number>,
         getCryptoInvestmentInUSD: (apiKey: string, apiSecret: string) => Promise<number>,
         getCoinbaseCryptoProductData: (apiKey: string, apiSecret: string) => Promise<Array<CryptoDetails>>,
-        getAllCoinbaseCrypto: (apiKey: string, apiSecret: string) => Promise<Array<CryptoDetails>>
+        getAllCoinbaseCrypto: (apiKey: string, apiSecret: string) => Promise<Array<CryptoDetails>>,
+        startTradingAssistant: (profileId: string) => Promise<void>,
+        stopTradingAssistant: (ProfileId: string) => void
     };
 }

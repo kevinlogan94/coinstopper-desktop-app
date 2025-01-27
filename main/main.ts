@@ -6,6 +6,7 @@ import { registerAppDataMethods } from "./services/appDataManager";
 import { registerMiscellaneousMethods } from './services/miscellaneous';
 import { registerSchedulerMethods } from './services/scheduler';
 import { registerCoinbaseMethods } from './services/coinbase';
+import { registerTradingAssistantMethods } from './services/tradingAssistantManager';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -87,3 +88,4 @@ registerAppDataMethods();
 registerMiscellaneousMethods();
 registerSchedulerMethods();
 registerCoinbaseMethods();
+registerTradingAssistantMethods();
