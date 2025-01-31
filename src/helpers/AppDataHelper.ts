@@ -58,6 +58,26 @@ export const getProfile = async (profileId: string): Promise<Profile> => {
   }
 };
 
+export const getAllProfiles = async (): Promise<Profile[]> => {
+  try {
+    // Load the appData object
+    const appData = await readAppData();
+
+    if (isEmptyObject(appData)) {
+      throw new Error("Empty or invalid AppData file.");
+    }
+
+    if (!Array.isArray(appData.profiles)) {
+      throw new Error("Invalid app data structure.");
+    }
+
+    return appData.profiles;
+  } catch (error) {
+    console.error("Error fetching profiles:", error.message);
+    throw error;
+  }
+};
+
 export const createProfile = async (
   name: string,
   credential: Credential

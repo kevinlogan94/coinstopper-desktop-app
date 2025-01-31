@@ -14,5 +14,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getAllCoinbaseCrypto: (apiKey: string, apiSecret: string) => ipcRenderer.invoke("coinbase-get-all-crypto", apiKey, apiSecret),
   getCoinbaseCryptoProductData: (apiKey: string, apiSecret: string) => ipcRenderer.invoke("coinbase-get-crypto-product-data", apiKey, apiSecret),
   startTradingAssistant: (profileId: string) => ipcRenderer.invoke("start-trading-assistant", profileId),
-  stopTradingAssistant: (profileId: string) => ipcRenderer.invoke("stop-trading-assistant", profileId)
+  stopTradingAssistant: (profileId: string) => ipcRenderer.invoke("stop-trading-assistant", profileId),
+  isTradingAssistantRunning: (profileId: string) => ipcRenderer.invoke("is-trading-assistant-running", profileId)
 });

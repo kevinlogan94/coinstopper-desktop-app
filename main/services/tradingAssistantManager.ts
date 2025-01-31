@@ -27,6 +27,7 @@ class TradingAssistantManager {
     // Run a child process for this profile at 10-second intervals
     const interval = setInterval(async () => {
       try {
+        console.log("TRACKER PROCESS");
         // await this.runChildProcess(profileID, filePath);
         console.log(`Child process completed successfully for profile ${profileID}.`);
       } catch (error) {
@@ -105,5 +106,9 @@ ipcMain.handle('start-trading-assistant', (event, profileId: string) => {
 
 ipcMain.handle('stop-trading-assistant', (event, profileId: string) => {
   tradingAssistentManager.stopTradingAssistant(profileId);
+});
+
+ipcMain.handle('is-trading-assistant-running', (event, profileId: string) => {
+  return tradingAssistentManager.isTradingAssistantRunning(profileId);
 });
 }
