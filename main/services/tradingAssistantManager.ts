@@ -23,6 +23,7 @@ class TradingAssistantManager {
 
     // Get the path to the user data folder (used as an argument for the child process)
     const filePath = app.getPath('userData');
+    console.log("TRACKER PROCESS");
 
     // Run a child process for this profile at 10-second intervals
     const interval = setInterval(async () => {

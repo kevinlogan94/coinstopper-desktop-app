@@ -253,6 +253,11 @@ const organizeBuyingPower = async () => {
 const toggleTradingAssistant = async () => {
   await updateProfile(props.profileId, profile => {
     profile.appConfig.trackerEnabled = !profile.appConfig.trackerEnabled;
+    if (profile.appConfig.trackerEnabled) {
+      window.electronAPI.startTradingAssistant(props.profileId);
+    } else {
+      window.electronAPI.stopTradingAssistant(props.profileId);
+    }
   });
   profile.value = await getProfile(props.profileId);
 }
