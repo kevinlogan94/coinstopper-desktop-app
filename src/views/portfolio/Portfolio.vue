@@ -35,17 +35,8 @@
           ></Button>
         </div>
       </div>
-      <!-- Chart Area -->
-      <div
-        class="flex justify-content-center align-items-center flex-column border-2 border-dashed border-round h-12rem mb-2"
-      >
-        <!-- <Button
-          label="Enable Smart Trading Assistant"
-          class="p-button-outlined p-button-primary"
-        /> -->
-      </div>
       <!-- Buying Power -->
-      <Accordion :activeIndex="0"
+      <Accordion
         ><AccordionTab>
           <template #header>
             <div class="flex justify-content-between align-items-center w-full">
@@ -104,7 +95,9 @@
             ></Button>
           </div> </AccordionTab
       ></Accordion>
+      <TransactionList v-if="transactions" :transactions="transactions" />
     </div>
+    <!-- Right Side Bar -->
     <div class="flex w-4 p-5">
       <ul class="p-0 w-7 m-0">
         <li class="flex p-1 slim-border">
@@ -152,7 +145,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { Profile } from "main/models";
+import { Profile, Transaction } from "main/models";
 import Button from "primevue/button";
 import { onMounted, ref } from "vue";
 import Accordion from "primevue/accordion";
@@ -163,10 +156,11 @@ import {
   getAllCoinbaseCryptoProductDataByProfileId,
   getCoinbaseCryptoInvestmentInUSDByProfileId,
 } from "@/helpers/CoinbaseHelper";
-import { getProfile, updateProfile } from "@/helpers/AppDataHelper";
+import { getLedgerByProfileId, getProfile, updateProfile } from "@/helpers/AppDataHelper";
 import { formatNumber } from "@/filters/FormatNumber";
 import router from "@/router";
 import { getBuyingMetrics } from "@/helpers/Helpers";
+import TransactionList from "@/components/portfolio/TransactionList.vue";
 
 const displayOnboardingModal = ref<boolean>(false);
 const showSetupMessage = ref<boolean>(true);
@@ -181,6 +175,7 @@ const priceChange = ref("");
 const buyingPower = ref("0");
 const coinbaseBalance = ref("0");
 const moneyHeldByAssistant = ref("0");
+const transactions = ref<Array<Transaction>>();
 
 //Right sidebar
 const cryptocurrencies = ref([]);
@@ -202,10 +197,11 @@ const setupPortfolio = async () => {
 
   profile.value = await getProfile(props.profileId);
 
-  await setupCryptoDisplay();
-  await organizeTotalInvestment();
+  organizeLedgerData();
   organizePriceChange();
   organizeBuyingPower();
+  await setupCryptoDisplay();
+  await organizeTotalInvestment();
   isLoading.value = false;
 };
 
@@ -249,6 +245,9 @@ const organizeBuyingPower = async () => {
   moneyHeldByAssistant.value = result.moneyHeldByAssistant;
   buyingPower.value = result.buyingPower;
 };
+const organizeLedgerData = async () => {
+  transactions.value = await getLedgerByProfileId(props.profileId);
+}
 
 const toggleTradingAssistant = async () => {
   await updateProfile(props.profileId, profile => {

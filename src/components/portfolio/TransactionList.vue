@@ -1,27 +1,61 @@
 <template>
   <div class="transaction-list">
-    <DataTable 
-      :value="transactions" 
-      :paginator="true" 
-      :rows="10" 
-      :sortMode="'multiple'" 
-      class="w-full">
-      <Column field="timestamp" header="Timestamp" sortable :body="formatDateBody" />
+    <DataTable
+      v-model:filters="filters"
+      :value="formattedTransactions"
+      :paginator="true"
+      :rows="5"
+      class="w-full"
+      :globalFilterFields="['timestamp', 'symbol', 'description', 'amount']"
+    >
+      <template #header>
+        <div
+          class="flex flex-wrap align-items-center justify-content-between gap-2"
+        >
+          <span class="text-xl text-900 font-bold">Transactions</span>
+          <IconField iconPosition="left">
+            <InputIcon>
+              <i class="pi pi-search" />
+            </InputIcon>
+            <InputText
+              v-model="filters['global'].value"
+              placeholder="Keyword Search"
+            />
+          </IconField>
+        </div>
+      </template>
+      <Column field="timestamp" header="Timestamp" sortable />
       <Column field="symbol" header="Symbol" sortable />
-      <Column field="description" header="Description" sortable :body="formatDescriptionBody" />
-      <Column field="amount" header="Amount" sortable :body="formatCurrencyBody" />
-      <Column field="balance" header="Balance" sortable :body="formatCurrencyBody" />
+      <Column field="description" header="Description" sortable
+        ><template #body="slotProps">
+          <Tag
+            :value="getFirstWord(slotProps.data.description)"
+            :severity="getDescriptionSeverity(slotProps.data.description)"
+          />
+        </template>
+      </Column>
+      <Column field="amount" header="Amount" sortable />
+      <Column field="balance" header="Balance" sortable />
+      <template #footer>
+        In total there are
+        {{ transactions ? transactions.length : 0 }} Transactions.
+      </template>
     </DataTable>
   </div>
 </template>
 
 <script setup lang="ts">
-import { PropType } from "vue";
+import { computed, onMounted, PropType, ref } from "vue";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import { formatNumber } from "@/filters/FormatNumber";
 import { formatDate } from "@/filters/FormatDate";
 import { Transaction } from "main/models";
+import Tag from "primevue/tag";
+import { FilterMatchMode } from "primevue/api";
+import InputText from "primevue/inputtext";
+import IconField from "primevue/iconfield";
+import InputIcon from "primevue/inputicon";
 
 const props = defineProps({
   transactions: {
@@ -30,27 +64,31 @@ const props = defineProps({
   },
 });
 
-const formatDateBody = (transaction: Transaction): string => {
-  return formatDate(transaction.timestamp);
-};
+const formattedTransactions = computed(() =>
+  props.transactions.map((t) => ({
+    ...t,
+    timestamp: formatDate(t.timestamp), // Format timestamp without mutating original data
+    balance: formatNumber(t.balance, { currency: true }),
+    amount: formatNumber(t.amount, { currency: true }),
+  }))
+);
 
-const formatCurrencyBody = (transaction: Transaction, field: string): string => {
-  return formatNumber(transaction[field as keyof Transaction]);
-};
+const filters = ref({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+});
 
-const formatDescriptionBody = (transaction: Transaction): string => {
-  const rowClass = getRowClass(transaction.description);
-  return `<span class="${rowClass}">${transaction.description}</span>`;
-};
-
-const getRowClass = (description: string): string => {
+const getDescriptionSeverity = (description: string) => {
   if (description.includes("Purchase") || description.includes("Deposit")) {
-    return "bg-green-100";
+    return "success";
   } else if (description.includes("Sell") || description.includes("Withdraw")) {
-    return "bg-red-100";
+    return "danger";
   } else {
-    return "bg-yellow-100";
+    return "warning";
   }
+};
+
+const getFirstWord = (str: string): string => {
+  return str.trim().split(/\s+/)[0] || "";
 };
 </script>
 
