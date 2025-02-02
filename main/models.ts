@@ -38,7 +38,7 @@ export interface TrackerConfig {
   apiRateLimitMs: number; // Minimum delay (in milliseconds) between API requests
   simulationMode: boolean; // Whether to run the algorithm in simulation mode (no actual trades)
   overrideParameters: boolean; // Whether to use custom parameters or defaults
-  parameters?: Parameters; // Configuration for trading-specific parameters
+  parameters?: TrackerParameters; // Configuration for trading-specific parameters
 }
 
 export interface Transaction {
@@ -49,123 +49,74 @@ export interface Transaction {
   description: string; // Description of the transaction (e.g., Deposit, Withdrawal, Trade, etc.)
 }
 
-export interface Tracker {
+export interface TrackerFileConfig {
+  parameters: TrackerParameters;
+  overrideParameters: boolean;
+  autoBuyInsActive: boolean;
+  manualPurchaseAmount: number | null;
+  manualSell: number | null;
   symbol: string;
-  active: boolean;
-  bank: number;
   held: number;
-  currentPrice: number; // Display in interface
+  heldValueUsd: number;
   buyPrice: number;
+  averageBuyPrice: number;
+  exitPrice: number | null;
+  currentPrice: number;
   highestPrice: number;
   lowestPrice: number;
   percentageChange: number;
-  baseIncrement: number;
-  quoteIncrement: number;
-  limits: Limits;
-  parameters: Parameters;
-  metrics: Metrics;
-  recommendations: Recommendations;
-  orders: Array<any>;
-  errors: Array<any>;
-  lastAction: string | null;
-  forceTrade: boolean;
-  datestamp: Date; // display in interface as last updated
+  lastActionPrice: number;
+  lastActionTime: number;
+  lastAction: string;
+  baseIncrement: string;
+  quoteIncrement: string;
+  availableFunds: number;
+  maxAllocation: number;
+  datestamp: string;
+  recommendation: Recommendation;
+  positions: Position[];
+  errors: string[];
 }
 
-//--------------- Tracker Models ----------------
-
-export interface Limits {
-  stopLossPrice: number | null;
-  trailingStopPrice: number | null;
-  targetProfitPrice: number | null;
-  targetProfitReached: boolean;
-  spreadCovered: boolean;
-  triggerState: Action;
-}
-
-export interface BollingerConfig {
-  bollingerStopPercentage: number;
-  bollingerSlopeThreshold: number;
-  bollingerPositionThreshold: number;
-}
-
-export interface Parameters {
-  candleGranularity: CandleGranularity;
+export interface TrackerParameters {
   longHours: number;
   shortHours: number;
   longVelocityWindow: number;
   shortVelocityWindow: number;
-  bollingerPeriod: number;
   longBollingerPeriod: number;
   shortBollingerPeriod: number;
-  buy: BollingerConfig;
-  sell: BollingerConfig;
+  coolOffHours: number;
+  coolOffPercentage: number;
+  reentryLimitPercentage: number;
+  spreadPercentage: number;
+  targetProfitPercentage: number;
+  trailingSellPercentage: number;
+  dropBuyPercentage: number;
+  trailingBuyPercentage: number;
+  stopLossPercentage: number;
 }
 
-export interface Metrics {
-  longMetrics: DurationMetrics;
-  shortMetrics: DurationMetrics;
-  combinedMetrics: CombinedMetrics;
-}
-
-export interface CombinedMetrics {
-  rangeRatio: number;
-  bottomRatio: number;
-  topRatio: number;
-  combinedPosition: number;
-}
-
-export interface DurationMetrics {
-  currentPrice: number;
-  pricePosition: number; //display in interface
-  high: number;
-  low: number;
-  range: number;
-  rangePct: number;
-  mean: number;
-  median: number;
-  volatility: number; //display in interface
-  trend: number; //display in interface
-  velocity: number; //display in interface
-  macd: {
-    macd: number;
-    signalLine: number;
-    histogram: number;
-  };
-  rsi: number;
-  ema: number;
-  bollingerPosition: {
-    upper: number;
-    middle: number;
-    lower: number;
-    price: number;
-    upperSlope: number;
-    lowerSlope: number;
-    pricePosition: number;
-    range: number;
-    averageRange: number;
-  };
-  start: Date;
-  end: Date;
-}
-
-export interface Recommendations {
-  buy: Action;
-  sell: Action;
-}
-
-export interface Action {
-  action: string; //enum
+export interface Recommendation {
+  action: "BUY" | "SELL" | "HOLD";
   reason: string;
-  strength: number | undefined;
 }
 
-type CandleGranularity =
-  | "ONE_MINUTE"
-  | "FIVE_MINUTES"
-  | "FIFTEEN_MINUTES"
-  | "THIRTY_MINUTES"
-  | "ONE_HOUR"
-  | "TWO_HOURS"
-  | "FOUR_HOURS"
-  | "ONE_DAY";
+export interface Position {
+  buyOrder: Order;
+  sellOrder: Order | null;
+  plAmount: number;
+  plPercentage: number;
+  stop: number | null;
+  limit: number | null;
+  estSaleValue?: number;
+}
+
+export interface Order {
+  orderId: string;
+  side: "BUY" | "SELL";
+  baseAmount: number;
+  currencyAmount: number;
+  basePrice: number;
+  timestamp: string;
+  pl?: number;
+}

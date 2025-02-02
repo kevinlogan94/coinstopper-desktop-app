@@ -15,6 +15,7 @@ interface Window {
         getAllCoinbaseCrypto: (apiKey: string, apiSecret: string) => Promise<Array<CryptoDetails>>,
         startTradingAssistant: (profileId: string) => Promise<void>,
         stopTradingAssistant: (profileId: string) => void,
-        isTradingAssistantRunning: (profileId: string) => Promise<boolean>
+        isTradingAssistantRunning: (profileId: string) => Promise<boolean>,
+        getTrackersByProfileId: (profileId: string) => Promise<{ [symbol: string]: TrackerConfig }>
     };
 }
