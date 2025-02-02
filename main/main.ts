@@ -4,7 +4,6 @@ import started from "electron-squirrel-startup";
 import { installExtension, VUEJS_DEVTOOLS } from "electron-devtools-installer";
 import { registerAppDataMethods } from "./services/appDataManager";
 import { registerMiscellaneousMethods } from "./services/miscellaneous";
-import { registerSchedulerMethods } from "./services/scheduler";
 import { registerCoinbaseMethods } from "./services/coinbase";
 import { registerTradingAssistantMethods } from "./services/tradingAssistantManager";
 import { registerTrackerFileManagementMethods } from "./services/trackerFileManager";
@@ -192,7 +191,6 @@ const organizeMenu = () => {
 // Register IPC handlers that the renderer process can call
 registerAppDataMethods();
 registerMiscellaneousMethods();
-registerSchedulerMethods();
 registerCoinbaseMethods();
 registerTradingAssistantMethods();
 registerTrackerFileManagementMethods();
