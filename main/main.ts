@@ -38,6 +38,9 @@ const createWindow = () => {
     );
   }
 
+  // organize everything for the nav bar
+  organizeMenu();
+
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
 
@@ -122,6 +125,65 @@ function createTray() {
     }
   });
 }
+
+const organizeMenu = () => {
+  if (!mainWindow) return;
+
+  const navigationMenu = {
+    label: "View",
+    submenu: [
+      {
+        label: "Home",
+        accelerator: "CmdOrCtrl+H",
+        click: () => mainWindow?.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL),
+      },
+      { type: "separator" },
+      {
+        label: "Refresh",
+        accelerator: "CmdOrCtrl+R",
+        click: () => mainWindow?.reload(),
+      },
+      { type: "separator" },
+      {
+        label: "Back",
+        accelerator: "Alt+Left",
+        click: () => {
+          if (mainWindow?.webContents.navigationHistory.canGoBack) {
+            mainWindow.webContents.goBack();
+          }
+        },
+      },
+      {
+        label: "Forward",
+        accelerator: "Alt+Right",
+        click: () => {
+          if (mainWindow?.webContents.navigationHistory.canGoForward) {
+            mainWindow.webContents.goForward();
+          }
+        },
+      },
+    ],
+  };
+
+  const developerMenu = {
+    label: "Developer",
+    submenu: [
+      {
+        label: "Toggle Developer Tools",
+        accelerator: "F12",
+        click: () => mainWindow?.webContents.toggleDevTools(),
+      },
+    ],
+  };
+
+  const menuTemplate: Array<any> = [navigationMenu];
+
+  if (!app.isPackaged) {
+    menuTemplate.push(developerMenu);
+  }
+
+  Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate));
+};
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
