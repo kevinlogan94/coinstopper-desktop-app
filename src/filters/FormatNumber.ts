@@ -26,7 +26,7 @@ export function formatNumber(
 
   // Percentage formatting
   if (percentage) {
-    return `${(numberToFormat * 100).toFixed(2)}%`; // Multiply by 100 and append '%'
+    return `${(numberToFormat).toFixed(2)}%`; // append '%'
   }
 
   // Currency formatting

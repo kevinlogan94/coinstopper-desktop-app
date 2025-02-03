@@ -18,15 +18,19 @@
         <div>
           <p class="text-2xl font-bold m-0 mb-2">Investing</p>
           <p class="text-4xl font-bold mb-1 mt-1" v-if="!isLoading">
-            {{ totalInvestment }}
+            {{ currentPortfolioValue }}
           </p>
-          <p class="text-red-500 text-sm mt-0">{{ priceChange }}</p>
+          <!-- <p class="text-red-500 text-sm mt-0">{{ priceChange }}</p> -->
         </div>
         <div>
           <Button
-            label="Trading Assistant"
+            :label="
+              profile?.appConfig?.trackerEnabled
+                ? 'Trading Assistant: Running'
+                : 'Trading Assistant: Paused'
+            "
             :icon="
-              profile?.appConfig?.trackerEnabled ? 'pi pi-play' : 'pi pi-pause'
+              profile?.appConfig?.trackerEnabled ? 'pi pi-pause' : 'pi pi-play'
             "
             :severity="
               profile?.appConfig?.trackerEnabled ? 'success' : 'warning'
@@ -34,6 +38,23 @@
             @click="toggleTradingAssistant"
           ></Button>
         </div>
+      </div>
+      <!-- KPIs -->
+      <div class="flex flex-wrap gap-3 justify-content-between mb-3">
+        <Card v-for="kpi in kpis" :key="kpi.label" class="kpi-card flex-1">
+          <template #content>
+            <p class="text-sm text-color-secondary">{{ kpi.label }}</p>
+            <p
+              class="text-lg font-bold"
+              :class="{
+                'text-green-500': !kpi.value.toString().includes('-'),
+                'text-red-500': kpi.value.toString().includes('-'),
+              }"
+            >
+              {{ kpi.value }}
+            </p>
+          </template>
+        </Card>
       </div>
       <!-- Buying Power -->
       <Accordion
@@ -50,7 +71,7 @@
                   style="cursor: pointer"
                 ></i>
               </div>
-              <span class="text-right font-bold text-primary">{{
+              <span class="text-right font-bold text-green-500">{{
                 buyingPower
               }}</span>
             </div>
@@ -152,29 +173,33 @@ import Accordion from "primevue/accordion";
 import AccordionTab from "primevue/accordiontab";
 import OnboardingModal from "@/components/portfolio/OnboardingModal.vue";
 import Message from "primevue/message";
+import { getAllCoinbaseCryptoProductDataByProfileId } from "@/helpers/CoinbaseHelper";
 import {
-  getAllCoinbaseCryptoProductDataByProfileId,
-  getCoinbaseCryptoInvestmentInUSDByProfileId,
-} from "@/helpers/CoinbaseHelper";
-import { getLedgerByProfileId, getProfile, updateProfile } from "@/helpers/AppDataHelper";
+  getLedgerByProfileId,
+  getProfile,
+  updateProfile,
+} from "@/helpers/AppDataHelper";
 import { formatNumber } from "@/filters/FormatNumber";
 import router from "@/router";
 import { getBuyingMetrics } from "@/helpers/Helpers";
 import TransactionList from "@/components/portfolio/TransactionList.vue";
+import Card from "primevue/card";
+import { LabelValuePair } from "@/models";
 
 const displayOnboardingModal = ref<boolean>(false);
 const showSetupMessage = ref<boolean>(true);
 const profile = ref<Profile>();
 const isLoading = ref<boolean>();
 
-//AboveChart
-const totalInvestment = ref("0");
+//AboveBuyingPower
+const currentPortfolioValue = ref("0");
 const priceChange = ref("");
 
-//BelowChart
+//BuyingPowerAndLower
 const buyingPower = ref("0");
 const coinbaseBalance = ref("0");
 const moneyHeldByAssistant = ref("0");
+const kpis = ref<Array<LabelValuePair>>([]);
 const transactions = ref<Array<Transaction>>();
 
 //Right sidebar
@@ -200,8 +225,8 @@ const setupPortfolio = async () => {
   organizeLedgerData();
   organizePriceChange();
   organizeBuyingPower();
-  await setupCryptoDisplay();
-  await organizeTotalInvestment();
+  setupCryptoDisplay();
+  organizeKpis();
   isLoading.value = false;
 };
 
@@ -221,22 +246,12 @@ const setupCryptoDisplay = async (): Promise<void> => {
     );
   }
 };
-const organizeTotalInvestment = async (): Promise<void> => {
-  const cryptoInvestmentInUSD =
-    await getCoinbaseCryptoInvestmentInUSDByProfileId(props.profileId);
-  totalInvestment.value = formatNumber(cryptoInvestmentInUSD, {
-    currency: true,
-  });
-};
 const organizePriceChange = () => {
   const verbiage = "ICON PRICE (PERCENTAGE) Today";
   priceChange.value = verbiage
     .replace("ICON", "▼")
     .replace("PRICE", formatNumber("20", { currency: true }))
     .replace("PERCENTAGE", formatNumber("0.02", { percentage: true }));
-};
-const organizeChart = () => {
-  //organize chart for display
 };
 const organizeBuyingPower = async () => {
   var result = await getBuyingMetrics(props.profileId);
@@ -247,10 +262,35 @@ const organizeBuyingPower = async () => {
 };
 const organizeLedgerData = async () => {
   transactions.value = await getLedgerByProfileId(props.profileId);
-}
+};
+const organizeKpis = async () => {
+  const rawMetrics = await window.electronAPI.getTrackerMetricsByProfileId(
+    props.profileId
+  );
+  currentPortfolioValue.value = formatNumber(rawMetrics.currentPortfolioValue, {
+    currency: true,
+  });
+
+  kpis.value = [
+    {
+      label: "Total Profit/Loss",
+      value: rawMetrics.totalPL != 0 ? formatNumber(rawMetrics.totalPL, { currency: true }) : "N/A",
+    },
+    {
+      label: "ROI",
+      value: rawMetrics.roiPercentage != 0 ? formatNumber(rawMetrics.roiPercentage, { percentage: true }) : "N/A",
+    },
+    {
+      label: "Held By Assistant",
+      value: formatNumber(rawMetrics.availableFunds, { currency: true }),
+    },
+    { label: "Winning Trades", value: rawMetrics.winningTrades },
+  ];
+  console.log(kpis.value);
+};
 
 const toggleTradingAssistant = async () => {
-  await updateProfile(props.profileId, profile => {
+  await updateProfile(props.profileId, (profile) => {
     profile.appConfig.trackerEnabled = !profile.appConfig.trackerEnabled;
     if (profile.appConfig.trackerEnabled) {
       window.electronAPI.startTradingAssistant(props.profileId);
@@ -259,7 +299,7 @@ const toggleTradingAssistant = async () => {
     }
   });
   profile.value = await getProfile(props.profileId);
-}
+};
 
 // Router methods
 const goToAddAsset = () => {
