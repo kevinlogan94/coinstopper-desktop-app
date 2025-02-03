@@ -16,6 +16,7 @@ interface Window {
         startTradingAssistant: (profileId: string) => Promise<void>,
         stopTradingAssistant: (profileId: string) => void,
         isTradingAssistantRunning: (profileId: string) => Promise<boolean>,
-        getTrackersByProfileId: (profileId: string) => Promise<{ [symbol: string]: TrackerConfig }>
+        getTrackersByProfileId: (profileId: string) => Promise<{ [symbol: string]: TrackerConfig }>,
+        getTrackerMetricsByProfileId: (profileId: string) => Promise<ProfileTrackerMetrics>,
     };
 }
