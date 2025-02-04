@@ -1,12 +1,12 @@
 <template>
   <Card class="center-card">
-    <template #title> Remove Asset </template>
+    <template #title> Remove Crypto </template>
     <template #content>
       <!-- Finalize -->
       <div class="step-content">
-        <p>Review and finalize the asset to remove from your portfolio:</p>
+        <p>Review and finalize the crypto to remove from your portfolio:</p>
         <ul>
-          <li>{{ asset?.base_name }}</li>
+          <li>{{ crypto?.base_name }}</li>
         </ul>
       </div>
     </template>
@@ -16,7 +16,7 @@
         <Button
           label="Back"
           severity="secondary"
-          @click="goToViewAsset"
+          @click="goToViewCrypto"
         />
         <Button
           label="Submit"
@@ -36,30 +36,30 @@ import { updateProfile } from "@/helpers/AppDataHelper";
 import { getAllCoinbaseCryptoProductDataByProfileId } from "@/helpers/CoinbaseHelper";
 import router from "@/router";
 
-const props = defineProps<{ profileId: string; assetId: string }>();
-const asset = ref();
+const props = defineProps<{ profileId: string; cryptoId: string }>();
+const crypto = ref();
 
-const goToViewAsset = () => {
+const goToViewCrypto = () => {
   router.push({
-    name: "viewAsset",
-    params: { profileId: props.profileId, assetId: props.assetId },
+    name: "viewCrypto",
+    params: { profileId: props.profileId, cryptoId: props.cryptoId },
   });
 }
 
 const finalizeRemoval = async () => {
   await updateProfile(props.profileId, (profile) => {
     profile.trackerConfig.whiteList = profile.trackerConfig.whiteList.filter(
-      (item) => item !== props.assetId
+      (item) => item !== props.cryptoId
     );
   });
   router.push({ name: "portfolio", params: { profileId: props.profileId } });
 };
 
 onMounted(async () => {
-  const investedAssets = await getAllCoinbaseCryptoProductDataByProfileId(
+  const investedCryptos = await getAllCoinbaseCryptoProductDataByProfileId(
     props.profileId
   );
-  asset.value = investedAssets.find((a) => a.product_id === props.assetId);
+  crypto.value = investedCryptos.find((a) => a.product_id === props.cryptoId);
 });
 </script>
 

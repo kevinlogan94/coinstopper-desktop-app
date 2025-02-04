@@ -127,7 +127,7 @@
         <li
           v-for="(currency, index) in cryptocurrencies"
           :key="index"
-          @click="goToViewAsset(currency.product_id)"
+          @click="goToViewCrypto(currency.product_id)"
           class="flex justify-content-between text-sm slim-border p-1"
         >
           <div>
@@ -151,7 +151,7 @@
           </div>
         </li>
         <li class="flex justify-content-center align-items-center slim-border">
-          <Button @click="goToAddAsset" class="m-3">Add</Button>
+          <Button @click="goToAddCrypto" class="m-3">Add</Button>
         </li>
       </ul>
     </div>
@@ -302,13 +302,13 @@ const toggleTradingAssistant = async () => {
 };
 
 // Router methods
-const goToAddAsset = () => {
-  router.push({ name: "addAsset", params: { profileId: props.profileId } });
+const goToAddCrypto = () => {
+  router.push({ name: "addCrypto", params: { profileId: props.profileId } });
 };
-const goToViewAsset = (assetId: string) => {
+const goToViewCrypto = (cryptoId: string) => {
   router.push({
-    name: "viewAsset",
-    params: { profileId: props.profileId, assetId: assetId },
+    name: "viewCrypto",
+    params: { profileId: props.profileId, cryptoId: cryptoId },
   });
 };
 const goToAllocateToAssistant = () => {

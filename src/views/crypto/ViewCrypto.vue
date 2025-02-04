@@ -1,13 +1,13 @@
 <template>
-  <Card class="view-asset">
-    <!-- Asset Name -->
+  <Card class="view-crypto">
+    <!-- Crypto Name -->
     <template #title>
-        <h1 class="text-2xl font-bold mb-4">{{ assetName }}</h1>
+        <h1 class="text-2xl font-bold mb-4">{{ cryptoName }}</h1>
     </template>
 
     <template #content>
-        <!-- Asset Summary -->
-        <div class="asset-summary mb-6">
+        <!-- Crypto Summary -->
+        <div class="crypto-summary mb-6">
           <p><strong>Current Value:</strong> {{ formatNumber(currentValue, {currency: true}) }}</p>
           <p><strong>Total Holdings:</strong> {{ totalHoldings }}</p>
           <p><strong>Percentage Changed:</strong> {{ percentageChanged }}%</p>
@@ -34,9 +34,9 @@
         <!-- Remove Button -->
         <div class="delete-button mt-6">
           <Button
-            label="Remove Asset"
+            label="Remove Crypto"
             class="p-button-danger"
-            @click="goToRemoveAsset"
+            @click="goToRemoveCrypto"
           />
         </div>
     </template>
@@ -54,10 +54,10 @@ import { getLedgerByProfileId } from "@/helpers/AppDataHelper";
 import { Transaction } from "main/models";
 import { formatNumber } from "@/filters/FormatNumber";
 
-const props = defineProps<{ profileId: string; assetId: string }>();
+const props = defineProps<{ profileId: string; cryptoId: string }>();
 
 // State variables
-const assetName = ref("");
+const cryptoName = ref("");
 const currentValue = ref(0);
 const totalHoldings = ref(0);
 const percentageChanged = ref(0);
@@ -67,10 +67,10 @@ const averageBuyPrice = ref(0);
 const totalInvestment = ref(0);
 const transactions = ref<Array<Transaction>>([]);
 
-const goToRemoveAsset = () => {
+const goToRemoveCrypto = () => {
   router.push({
-    name: "removeAsset",
-    params: { profileId: props.profileId, assetId: props.assetId },
+    name: "removeCrypto",
+    params: { profileId: props.profileId, cryptoId: props.cryptoId },
   });
 };
 
@@ -78,18 +78,18 @@ onMounted(async () => {
   const allAvailableCrypto = await getAllCoinbaseCryptoProductDataByProfileId(
     props.profileId
   );
-  const asset = allAvailableCrypto.find((a) => a.product_id === props.assetId);
+  const crypto = allAvailableCrypto.find((a) => a.product_id === props.cryptoId);
 
-  if (asset) {
-    assetName.value = asset.base_name;
-    currentValue.value = asset.priceInUSD;
-    totalHoldings.value = asset.balanceInCrypto;
-    percentageChanged.value = asset.priceChangePercentage24h;
-    // roi.value = asset.roi;
-    // netProfitLoss.value = asset.net_profit_loss;
-    // averageBuyPrice.value = asset.average_buy_price;
+  if (crypto) {
+    cryptoName.value = crypto.base_name;
+    currentValue.value = crypto.priceInUSD;
+    totalHoldings.value = crypto.balanceInCrypto;
+    percentageChanged.value = crypto.priceChangePercentage24h;
+    // roi.value = crypto.roi;
+    // netProfitLoss.value = crypto.net_profit_loss;
+    // averageBuyPrice.value = crypto.average_buy_price;
   } else {
-    console.error("Missing Asset");
+    console.error("Missing Crypto");
   }
   
   await organizeTrasactions();
@@ -97,20 +97,20 @@ onMounted(async () => {
 
 const organizeTrasactions = async () => {
     var ledger = await getLedgerByProfileId(props.profileId);
-    var assetLedger = ledger.filter(t => t.symbol === props.assetId);
-    transactions.value = assetLedger;
+    var cryptoLedger = ledger.filter(t => t.symbol === props.cryptoId);
+    transactions.value = cryptoLedger;
 }
 
 </script>
 
 <style scoped>
-.view-asset {
+.view-crypto {
   max-width: 800px;
   margin: 0 auto;
   padding: 1rem;
 }
 
-.asset-summary p,
+.crypto-summary p,
 .performance-metrics p {
   margin: 0.5rem 0;
 }

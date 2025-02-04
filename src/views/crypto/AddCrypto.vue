@@ -1,21 +1,16 @@
 <template>
   <Card class="center-card">
-    <template #title> Add Asset </template>
+    <template #title> Add Crypto </template>
     <template #content>
-      <Steps
-        :model="steps"
-        v-model:activeStep="stepComponentStep"
-        class="step-indicator"
-      />
 
-      <!-- Step 1: Add Asset -->
+      <!-- Step 1: Add Crypto -->
       <div v-if="currentStep === 1" class="step-content">
-        <p>Select the assets you want to add to your portfolio.</p>
+        <p>Select the Crypto you want your assistant to manage.</p>
         <MultiSelect
-          v-model="selectedAssets"
+          v-model="selectedCryptos"
           :options="cryptoOptions"
           optionLabel="label"
-          placeholder="Select Assets"
+          placeholder="Select Crypto"
           filter
           class="w-full"
         />
@@ -23,16 +18,14 @@
 
       <!-- Step 2: Finalize -->
       <div v-else-if="currentStep === 2" class="step-content">
-        <p>Review and finalize the assets to add to your portfolio:</p>
+        <p>Review and finalize the Cryptos to add to your portfolio:</p>
         <ul>
-          <li v-for="asset in selectedAssets" :key="asset.product_id">
-            {{ asset.label }}
+          <li v-for="crypto in selectedCryptos" :key="crypto.product_id">
+            {{ crypto.label }}
           </li>
         </ul>
       </div>
-    </template>
 
-    <template #footer>
       <div class="card-footer">
         <Button
           v-if="currentStep > 1"
@@ -43,16 +36,24 @@
         <Button
           v-if="currentStep < steps.length"
           label="Next"
-          :disabled="currentStep === 1 && selectedAssets.length === 0"
+          :disabled="currentStep === 1 && selectedCryptos.length === 0"
           @click="goToStep(currentStep + 1)"
         />
         <Button
           v-if="currentStep === steps.length"
           label="Submit"
           severity="success"
-          @click="finalizeAssets"
+          @click="finalizeCryptos"
         />
       </div>
+    </template>
+
+    <template #footer>
+      <Steps
+        :model="steps"
+        v-model:activeStep="stepComponentStep"
+        class="step-indicator"
+      />
     </template>
   </Card>
 </template>
@@ -70,18 +71,18 @@ import { getProfile, updateProfile } from "@/helpers/AppDataHelper";
 const props = defineProps<{ profileId: string }>();
 
 const currentStep = ref(1);
-const selectedAssets = ref([]);
+const selectedCryptos = ref([]);
 const cryptoOptions = ref([]);
 
 const stepComponentStep = computed(() => currentStep.value - 1);
-const steps = [{ label: "Add Asset" }, { label: "Finalize" }];
+const steps = [{ label: "Add Crypto" }, { label: "Finalize" }];
 
 const goToStep = (step: number) => {
   currentStep.value = step;
 };
 
-const finalizeAssets = async () => {
-  const whiteListAdditions = selectedAssets.value.map((x) => x.value);
+const finalizeCryptos = async () => {
+  const whiteListAdditions = selectedCryptos.value.map((x) => x.value);
 
   await updateProfile(props.profileId, (profile) => {
     profile.trackerConfig.whiteList.push(...whiteListAdditions);

@@ -4,9 +4,9 @@ import CreateProfile from "@/views/profile/CreateProfile.vue";
 import ProfileList from "@/views/profile/ProfileList.vue";
 import EditProfile from "@/views/profile/EditProfile.vue";
 import Portfolio from "@/views/portfolio/Portfolio.vue";
-import AddAsset from "@/views/asset/AddAsset.vue";
-import ViewAsset from "@/views/asset/ViewAsset.vue";
-import RemoveAsset from "@/views/asset/RemoveAsset.vue";
+import AddCrypto from "@/views/crypto/AddCrypto.vue";
+import ViewCrypto from "@/views/crypto/ViewCrypto.vue";
+import RemoveCrypto from "@/views/crypto/RemoveCrypto.vue";
 import ManageAssistantAllocations from "@/views/portfolio/ManageAssistantAllocations.vue";
 
 const routes: Array<RouteRecordRaw> = [
@@ -44,26 +44,26 @@ const routes: Array<RouteRecordRaw> = [
     props: true, // Enable props to pass profileId to the component
   },
   {
-    path: "/asset/:profileId",
-    name: "asset",
+    path: "/crypto/:profileId",
+    name: "crypto",
     props: true, // Pass profileId as a prop to child routes
     children: [
       {
         path: "add",
-        name: "addAsset",
-        component: AddAsset,
+        name: "addCrypto",
+        component: AddCrypto,
         props: true
       },
       {
-        path: "asset/view/:assetId",
-        name: "viewAsset",
-        component: ViewAsset,
+        path: "view/:cryptoId",
+        name: "viewCrypto",
+        component: ViewCrypto,
         props: true, // Pass assetId as a prop to the component
       },
       {
-        path: "remove/:assetId",
-        name: "removeAsset",
-        component: RemoveAsset,
+        path: "remove/:cryptoId",
+        name: "removeCrypto",
+        component: RemoveCrypto,
         props: true, // Pass assetId as a prop to the component
       },
     ],
