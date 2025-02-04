@@ -21,30 +21,34 @@ export const registerCoinbaseMethods = () => {
   // funds that are not invested but are sitting and waiting to be invested.
   ipcMain.handle(
     "coinbase-get-balance",
-    async (_event, apiKey: string, apiSecret: string): Promise<number> => {
+    async (_event, apiKey: string, apiSecret: string): Promise<{ usdBalance: number; usdcBalance: number }> => {
       const client = CreateClient(apiKey, apiSecret);
       try {
         const response = await client.getAccounts();
-
-        //Cash Balance
-        return response.accounts
-          .filter(
-            (account: any) =>
-              account.type.toLowerCase().includes("fiat") &&
-              parseFloat(account.available_balance.value) > 0
-          )
-          .reduce(
-            (total: number, account: any) =>
-              total + parseFloat(account.available_balance.value),
-            0
-          );
+  
+        let usdBalance = 0;
+        let usdcBalance = 0;
+  
+        response.accounts.forEach((account: any) => {
+          const balance = parseFloat(account.available_balance?.value || "0");
+  
+          if (balance > 0) {
+            if (account.type.toLowerCase().includes("fiat")) {
+              usdBalance += balance; // USD balance (Fiat)
+            } else if (account.currency === "USDC") {
+              usdcBalance += balance; // USDC balance (Crypto stablecoin)
+            }
+          }
+        });
+  
+        return { usdBalance, usdcBalance };
       } catch (error) {
-        console.error("Error fetching fiat balance:", error.message);
-        throw new Error("Failed to retrieve fiat balance.");
+        console.error("Error fetching balances:", error.message);
+        throw new Error("Failed to retrieve balances.");
       }
     }
   );
-};
+  
 
 ipcMain.handle(
   "coinbase-get-investments-in-USD",
@@ -153,15 +157,6 @@ ipcMain.handle(
   }
 );
 
-export interface CryptoDetails {
-  product_id: string; // ex: BTC-USD
-  base_name: string; // Plain english name of the crypto: Bitcoin
-  currency: string; // The name of the currency: BTC
-  balanceInCrypto: number; // How much of the crypto that I'm invested in currently. ex: 0.012
-  priceInUSD: number; // The cost to purchase the crypto in US Dollars
-  priceChangePercentage24h: number; // How much the price has changed in 24h
-}
-
 ipcMain.handle(
   "coinbase-get-all-crypto",
   async (
@@ -219,6 +214,16 @@ ipcMain.handle(
     }
   }
 );
+}
+
+export interface CryptoDetails {
+  product_id: string; // ex: BTC-USD
+  base_name: string; // Plain english name of the crypto: Bitcoin
+  currency: string; // The name of the currency: BTC
+  balanceInCrypto: number; // How much of the crypto that I'm invested in currently. ex: 0.012
+  priceInUSD: number; // The cost to purchase the crypto in US Dollars
+  priceChangePercentage24h: number; // How much the price has changed in 24h
+}
 
 export const CreateClient = (
   apiKey: string,

@@ -10,7 +10,9 @@ export async function getCoinbaseBalanceByProfileId(profileId: string): Promise<
       const credentials = await getCredentialsByProfileId(profileId);
 
       // Call the method on the window object
-      return await window.electronAPI.getCoinbaseBalance(credentials.apiKey, credentials.apisecret);
+      const balance = await window.electronAPI.getCoinbaseBalance(credentials.apiKey, credentials.apisecret);
+      
+      return balance?.usdcBalance;
     } catch (error) {
       console.error(`Error fetching Coinbase balance for profile ID ${profileId}:`, error.message);
       throw error;

@@ -9,7 +9,7 @@ interface Window {
         refreshApp: () => Promise<void>,
         openExternal: (url: string) => void,
         validateCoinbaseCredentials: (apiKey: string, apiSecret: string) => Promise<boolean>,
-        getCoinbaseBalance: (apiKey: string, apiSecret: string) => Promise<number>,
+        getCoinbaseBalance: (apiKey: string, apiSecret: string) => Promise<{ usdBalance: number; usdcBalance: number }>,
         getCryptoInvestmentInUSD: (apiKey: string, apiSecret: string) => Promise<number>,
         getCoinbaseCryptoProductData: (apiKey: string, apiSecret: string) => Promise<Array<CryptoDetails>>,
         getAllCoinbaseCrypto: (apiKey: string, apiSecret: string) => Promise<Array<CryptoDetails>>,
