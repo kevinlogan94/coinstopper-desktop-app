@@ -1,19 +1,19 @@
 <template>
-  <Card class="manage-fund">
+  <Card class="manage-allocations">
     <template #title>
-      {{ action === "add" ? "Add Funds" : "Remove Funds" }}
+      {{ action === "allocate" ? "Allocate to Assistant" : "Withdraw from Assistant" }}
     </template>
 
     <template #content>
       <Steps :model="steps" v-model:activeStep="currentStep" class="mb-4" />
 
-      <!-- Step 1: Add or Remove Funds -->
+      <!-- Step 1: Allocate or Withdraw from Assistant -->
       <div v-if="currentStep === 0" class="step-content">
         <p>
           {{
-            action === "add"
-              ? `Enter the amount you want to add to the fund. You have $${buyingPower} available.`
-              : `Enter the amount you want to remove from the fund.`
+            action === "allocate"
+              ? `Enter the amount you want to allocate to the assistant. You have $${buyingPower} available.`
+              : `Enter the amount you want to withdraw from the assistant.`
           }}
         </p>
         <InputNumber
@@ -22,15 +22,15 @@
           currency="USD"
           placeholder="$0.00"
           class="w-full"
-          :min="action === 'add' ? 0 : 0"
-          :max="action === 'add' ? buyingPower : balanceHeldByAssistant"
+          :min="action === 'allocate' ? 0 : 0"
+          :max="action === 'allocate' ? buyingPower : balanceHeldByAssistant"
         />
-        <small v-if="action === 'add'" class="text-gray-500">
-          Maximum you can add:
+        <small v-if="action === 'allocate'" class="text-gray-500">
+          Maximum you can allocate:
           {{ formatNumber(buyingPower, { currency: true }) }}
         </small>
-        <small v-if="action === 'remove'" class="text-gray-500">
-          Maximum you can remove:
+        <small v-if="action === 'withdraw'" class="text-gray-500">
+          Maximum you can withdraw:
           {{ formatNumber(balanceHeldByAssistant, { currency: true }) }}
         </small>
       </div>
@@ -39,20 +39,20 @@
       <div v-if="currentStep === 1" class="step-content">
         <p>
           {{
-            action === "add"
-              ? "You are about to add:"
-              : "You are about to remove:"
+            action === "allocate"
+              ? "You are about to allocate:"
+              : "You are about to withdraw:"
           }}
           <strong>{{ formatNumber(amount, { currency: true }) }}</strong>
         </p>
         <p>
           {{
-            action === "add"
+            action === "allocate"
               ? "With this change, your smart assistant will have "
-              : "With this change, your buying power will be "
+              : "With this change, your available funds will be "
           }}
           <strong>{{
-            action === "add"
+            action === "allocate"
               ? formatNumber(balanceHeldByAssistant + amount, {
                   currency: true,
                 })
@@ -106,7 +106,7 @@ import {
 import { addToLedger, getLedgerByProfileId } from "@/helpers/AppDataHelper";
 import { Transaction } from "main/models";
 
-const props = defineProps<{ profileId: string; action: "add" | "remove" }>();
+const props = defineProps<{ profileId: string; action: "allocate" | "withdraw" }>();
 
 const currentStep = ref(0);
 const amount = ref<number | null>(null);
@@ -115,7 +115,7 @@ const balanceHeldByAssistant = ref(0);
 const rawBuyingMetrics = ref<RawBuyingMetrics>();
 
 const steps = [
-  { label: props.action === "add" ? "Add Funds" : "Remove Funds" },
+  { label: props.action === "allocate" ? "Allocate to Assistant" : "Withdraw from Assistant" },
   { label: "Finalize" },
 ];
 
@@ -133,19 +133,19 @@ const newBuyingPower = computed(() => {
 
 const finalize = () => {
   console.log(
-    `${props.action === "add" ? "Added" : "Removed"} ${
+    `${props.action === "allocate" ? "Allocated" : "Withdrawn"} ${
       amount.value
     } to/from profile ${props.profileId}`
   );
   AddActionToLedger(
     amount.value,
-    props.action === "add" ? "deposit" : "withdraw"
+    props.action === "allocate" ? "deposit" : "withdraw"
   );
   router.push({ name: "portfolio", params: { profileId: props.profileId } });
 };
 
 const maxAmount = computed(() => {
-  return props.action === "add"
+  return props.action === "allocate"
     ? buyingPower.value
     : balanceHeldByAssistant.value;
 });
@@ -156,7 +156,7 @@ onMounted(async () => {
   balanceHeldByAssistant.value = ConvertStringToNumber(
     buyingMetrics.moneyHeldByAssistant
   );
-  if (props.action === "remove") {
+  if (props.action === "withdraw") {
     rawBuyingMetrics.value = await getRawBuyingMetrics(props.profileId);
   }
 });
@@ -183,7 +183,7 @@ const AddActionToLedger = async (
 </script>
 
 <style scoped>
-.manage-fund {
+.manage-allocations {
   max-width: 500px;
   margin: 0 auto;
   padding: 1rem;

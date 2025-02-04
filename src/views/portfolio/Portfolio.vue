@@ -99,20 +99,20 @@
               <span class="font-bold">{{ buyingPower }}</span>
             </div>
             <Button
-              label="Deposit Funds"
+              label="Allocate to Assistant"
               severity="success"
               class="mt-3 p-button-outlined"
               icon="pi pi-plus"
               :disabled="buyingPower.includes('0.00')"
-              @click="goToAddFund"
+              @click="goToAllocateToAssistant"
             />
             <Button
-              label="Remove Funds"
+              label="Withdraw from Assistant"
               class="mt-3 p-button-outlined"
               severity="danger"
               icon="pi pi-minus"
               :disabled="moneyHeldByAssistant.includes('0.00')"
-              @click="goToRemoveFund"
+              @click="goToWithdrawFromAssistant"
             ></Button>
           </div> </AccordionTab
       ></Accordion>
@@ -311,16 +311,16 @@ const goToViewAsset = (assetId: string) => {
     params: { profileId: props.profileId, assetId: assetId },
   });
 };
-const goToAddFund = () => {
+const goToAllocateToAssistant = () => {
   router.push({
-    name: "manageFund",
-    params: { profileId: props.profileId, action: "add" },
+    name: "manageAssistantAllocations",
+    params: { profileId: props.profileId, action: "allocate" },
   });
 };
-const goToRemoveFund = () => {
+const goToWithdrawFromAssistant = () => {
   router.push({
-    name: "manageFund",
-    params: { profileId: props.profileId, action: "remove" },
+    name: "manageAssistantAllocations",
+    params: { profileId: props.profileId, action: "withdraw" },
   });
 };
 </script>
