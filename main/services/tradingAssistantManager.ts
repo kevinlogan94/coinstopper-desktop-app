@@ -28,11 +28,10 @@ class TradingAssistantManager {
     // Run a child process for this profile at 10-second intervals
     const interval = setInterval(async () => {
       try {
-        console.log("TRACKER PROCESS");
-        // await this.runChildProcess(profileID, filePath);
-        console.log(`Child process completed successfully for profile ${profileID}.`);
+        console.log("TRACKER PROCESS"); //Insert tracker method here.
+        console.log(`Tracker process completed successfully for profile ${profileID}.`);
       } catch (error) {
-        console.error(`Error in child process for profile ${profileID}:`, error);
+        console.error(`Error in Tracker process for profile ${profileID}:`, error);
       }
     }, 10000);
 
@@ -72,29 +71,6 @@ class TradingAssistantManager {
    */
   public isTradingAssistantRunning(profileID: string): boolean {
     return this.isRunning.get(profileID) || false;
-  }
-
-  private async runChildProcess(profileID: string, filePath: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      // Fork the static module path and pass the arguments
-      const child = fork(this.modulePath, [profileID, filePath], { stdio: 'inherit' });
-
-      child.on('message', (message) => {
-        console.log(`Child process message for profile ${profileID}:`, message);
-      });
-
-      child.on('error', (error) => {
-        reject(error);
-      });
-
-      child.on('exit', (code) => {
-        if (code === 0) {
-          resolve();
-        } else {
-          reject(new Error(`Child process for profile ${profileID} exited with code ${code}`));
-        }
-      });
-    });
   }
 }
 

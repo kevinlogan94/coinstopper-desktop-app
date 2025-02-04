@@ -149,7 +149,7 @@ const organizeMenu = () => {
         accelerator: "Alt+Left",
         click: () => {
           if (mainWindow?.webContents.navigationHistory.canGoBack) {
-            mainWindow.webContents.goBack();
+            mainWindow.webContents.navigationHistory.goBack();
           }
         },
       },
@@ -158,7 +158,7 @@ const organizeMenu = () => {
         accelerator: "Alt+Right",
         click: () => {
           if (mainWindow?.webContents.navigationHistory.canGoForward) {
-            mainWindow.webContents.goForward();
+            mainWindow.webContents.navigationHistory.goForward();
           }
         },
       },
