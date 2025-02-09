@@ -41,7 +41,7 @@
       </div>
       <!-- KPIs -->
       <div class="flex flex-wrap gap-3 justify-content-between mb-3">
-        <Card v-for="kpi in kpis" :key="kpi.label" class="kpi-card flex-1">
+        <Card v-for="kpi in kpis" :key="kpi.label" class="kpi-card flex-1 bg-gray-850">
           <template #content>
             <p class="text-sm text-color-secondary">{{ kpi.label }}</p>
             <p
@@ -119,22 +119,22 @@
       <TransactionList v-if="transactions" :transactions="transactions" />
     </div>
     <!-- Right Side Bar -->
-    <div class="flex w-4 p-5">
+    <div class="flex w-4 p-5 crypto-list">
       <ul class="p-0 w-7 m-0">
-        <li class="flex p-1 slim-border">
+        <li class="flex p-1 slim-border bg-gray-850">
           <p class="m-1">Cryptocurrencies</p>
         </li>
         <li
           v-for="(currency, index) in cryptocurrencies"
           :key="index"
           @click="goToViewCrypto(currency.product_id)"
-          class="flex justify-content-between text-sm slim-border p-1"
+          class="flex justify-content-between text-sm slim-border bg-gray-850 cursor-pointer"
         >
           <div>
             <p class="m-1">{{ currency.currency }}</p>
             <p class="m-1">{{ currency.balanceInCrypto }}</p>
           </div>
-          <div>
+          <div class="flex flex-column align-items-end">
             <p class="m-1">
               {{ formatNumber(currency.priceInUSD, { currency: true }) }}
             </p>
@@ -150,7 +150,7 @@
             </p>
           </div>
         </li>
-        <li class="flex justify-content-center align-items-center slim-border">
+        <li class="flex justify-content-center align-items-center slim-border-bottom bg-gray-850">
           <Button @click="goToAddCrypto" class="m-3">Add</Button>
         </li>
       </ul>
@@ -286,7 +286,6 @@ const organizeKpis = async () => {
     },
     { label: "Winning Trades", value: rawMetrics.winningTrades },
   ];
-  console.log(kpis.value);
 };
 
 const toggleTradingAssistant = async () => {
@@ -327,6 +326,10 @@ const goToWithdrawFromAssistant = () => {
 
 <style lang="scss" scoped>
 .slim-border {
-  border: 0.5px solid rgba(255, 255, 255, 0.5); /* Custom half-pixel transparent border */
+  border: 1px solid #383838; /* Custom half-pixel transparent border */
+  border-bottom: none;
+}
+.slim-border-bottom {
+  border: 1px solid #383838; /* Custom half-pixel transparent border */
 }
 </style>

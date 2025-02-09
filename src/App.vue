@@ -57,6 +57,7 @@ const displayCenteredLayout = computed(() => {
   display: flex;
   flex-direction: column;
   min-height: 100vh; // Ensures the container takes up the full viewport height
+  background-color: #141414;
 
   .footer {
     position: fixed;

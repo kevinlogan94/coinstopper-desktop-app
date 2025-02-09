@@ -2,34 +2,42 @@
   <Card class="view-crypto">
     <!-- Crypto Name -->
     <template #title>
-      <h1 class="text-2xl font-bold mb-4">{{ cryptoName }}</h1>
+      <div class="flex justify-content-between">
+        <h1 class="text-2xl font-bold m-0 mb-1">{{ crypto?.base_name }}</h1>
+        <Button
+          :label="autoBuy ? 'Auto Buying: Running' : 'Auto Buying: Paused'"
+          :icon="autoBuy ? 'pi pi-pause' : 'pi pi-play'"
+          :severity="autoBuy ? 'success' : 'warning'"
+          @click="toggleAutoBuying"
+        ></Button>
+      </div>
     </template>
 
     <template #content>
       <!-- Crypto Summary -->
-      <div class="crypto-summary mb-6">
+      <!-- <div class="crypto-summary mb-6">
         <p>
           <strong>Current Value:</strong>
           {{ formatNumber(currentValue, { currency: true }) }}
         </p>
         <p><strong>Total Holdings:</strong> {{ totalHoldings }}</p>
         <p><strong>Percentage Changed:</strong> {{ percentageChanged }}%</p>
-      </div>
-      <!-- Performance Metrics -->
-      <div class="performance-metrics mb-6">
-        <p><strong>Return on Investment (ROI):</strong> {{ roi }}%</p>
-        <p>
-          <strong>Net Profit/Loss:</strong>
-          {{ formatNumber(netProfitLoss, { currency: true }) }}
-        </p>
-        <p>
-          <strong>Average Buy Price:</strong>
-          {{ formatNumber(averageBuyPrice, { currency: true }) }}
-        </p>
-        <p>
-          <strong>Total Investment:</strong>
-          {{ formatNumber(totalInvestment, { currency: true }) }}
-        </p>
+      </div> -->
+      <div class="flex flex-wrap gap-3 justify-content-between mb-3">
+        <Card v-for="kpi in kpis" :key="kpi.label" class="kpi-card flex-1">
+          <template #content>
+            <p class="text-sm text-color-secondary">{{ kpi.label }}</p>
+            <p
+              class="text-lg font-bold"
+              :class="{
+                'text-green-500': !kpi.value.toString().includes('-'),
+                'text-red-500': kpi.value.toString().includes('-'),
+              }"
+            >
+              {{ kpi.value }}
+            </p>
+          </template>
+        </Card>
       </div>
       <!-- Position List -->
       <PositionList
@@ -62,26 +70,25 @@ import PositionList from "@/components/crypto/PositionList.vue";
 import { getTrackerMetricsByProfileId } from "@/helpers/ElectronHelper";
 import { CoinTrackerMetrics } from "main/services/trackerFileManager";
 import { CryptoDetails } from "main/services/coinbase";
+import { LabelValuePair } from "@/models";
 
 const props = defineProps<{ profileId: string; cryptoId: string }>();
 
-// State variables
-const cryptoName = ref("");
-const currentValue = ref(0);
-const totalHoldings = ref(0);
-const percentageChanged = ref(0);
-const roi = ref(0);
-const netProfitLoss = ref(0);
-const averageBuyPrice = ref(0);
-const totalInvestment = ref(0);
+const autoBuy = ref(true);
+
 const cryptoMetrics = ref<CoinTrackerMetrics>();
 const crypto = ref<CryptoDetails>();
+const kpis = ref<Array<LabelValuePair>>([]);
 
 const goToRemoveCrypto = () => {
   router.push({
     name: "removeCrypto",
     params: { profileId: props.profileId, cryptoId: props.cryptoId },
   });
+};
+
+const toggleAutoBuying = () => {
+  //toggle auto buying
 };
 
 onMounted(async () => {
@@ -96,23 +103,43 @@ const organizeCrypto = async () => {
   crypto.value = allAvailableCrypto.find(
     (a) => a.product_id === props.cryptoId
   );
-
-  if (crypto.value) {
-    cryptoName.value = crypto.value.base_name;
-    currentValue.value = crypto.value.priceInUSD;
-    totalHoldings.value = crypto.value.balanceInCrypto;
-    percentageChanged.value = crypto.value.priceChangePercentage24h;
-    // roi.value = crypto.roi;
-    // netProfitLoss.value = crypto.net_profit_loss;
-    // averageBuyPrice.value = crypto.average_buy_price;
-  } else {
-    console.error("Missing Crypto");
-  }
 };
 
 const organizeTrackerFileConfig = async () => {
   const trackerMetrics = await getTrackerMetricsByProfileId(props.profileId);
   cryptoMetrics.value = trackerMetrics.individualCoinMetrics[props.cryptoId];
+
+  if (!cryptoMetrics.value) return;
+
+  kpis.value = [
+    {
+      label: "Total Profit/Loss",
+      value:
+        cryptoMetrics.value?.plAmount != 0
+          ? formatNumber(cryptoMetrics.value.plAmount, { currency: true })
+          : "N/A",
+    },
+    {
+      label: "Profit/Loss Percentage",
+      value:
+        cryptoMetrics.value.plPercentage != 0
+          ? formatNumber(cryptoMetrics.value.plPercentage, { percentage: true })
+          : "N/A",
+    },
+    {
+      label: "Held By Assistant",
+      value: formatNumber(cryptoMetrics.value.heldValueUsd, { currency: true }),
+    },
+    {
+      label: "Total Invested",
+      value:
+        cryptoMetrics.value.totalInvested != 0
+          ? formatNumber(cryptoMetrics.value.totalInvested, {
+              currency: true,
+            })
+          : "N/A",
+    },
+  ];
 };
 </script>
 

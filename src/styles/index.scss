@@ -9,4 +9,14 @@ body {
     box-sizing: border-box;
   }
   
-  
+.p-card { 
+  background-color: #121212;
+  .p-card {
+    background-color: #1e1e1e;
+  }
+}
+
+//default component background color
+.bg-gray-850 {
+  background-color: #1e1e1e;
+}
