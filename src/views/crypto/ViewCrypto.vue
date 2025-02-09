@@ -4,12 +4,22 @@
     <template #title>
       <div class="flex justify-content-between">
         <h1 class="text-2xl font-bold m-0 mb-1">{{ crypto?.base_name }}</h1>
-        <Button
-          :label="autoBuy ? 'Auto Buying: Running' : 'Auto Buying: Paused'"
-          :icon="autoBuy ? 'pi pi-pause' : 'pi pi-play'"
-          :severity="autoBuy ? 'success' : 'warning'"
-          @click="toggleAutoBuying"
-        ></Button>
+        <div>
+          <Button
+            :label="autoBuy ? 'Auto Buying: Running' : 'Auto Buying: Paused'"
+            :icon="autoBuy ? 'pi pi-pause' : 'pi pi-play'"
+            :severity="autoBuy ? 'success' : 'warning'"
+            @click="toggleAutoBuying"
+          ></Button>
+          <Button
+            class="ml-2"
+            icon="pi pi-trash"
+            severity="danger"
+            outlined
+            rounded
+            @click="goToRemoveCrypto"
+          ></Button>
+        </div>
       </div>
     </template>
 
@@ -44,17 +54,6 @@
         :coin-symbol="crypto?.base_name"
         :positions="cryptoMetrics?.positions"
       />
-    </template>
-
-    <template #footer>
-      <!-- Remove Button -->
-      <div class="delete-button mt-6">
-        <Button
-          label="Remove Crypto"
-          class="p-button-danger"
-          @click="goToRemoveCrypto"
-        />
-      </div>
     </template>
   </Card>
 </template>
