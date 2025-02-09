@@ -5,7 +5,7 @@
 
       <!-- Step 1: Add Crypto -->
       <div v-if="currentStep === 1" class="step-content">
-        <p>Select the Crypto you want your assistant to manage.</p>
+        <p>Select the cryptocurrency you want your assistant to manage.</p>
         <MultiSelect
           v-model="selectedCryptos"
           :options="cryptoOptions"
@@ -18,7 +18,7 @@
 
       <!-- Step 2: Finalize -->
       <div v-else-if="currentStep === 2" class="step-content">
-        <p>Review and finalize the Cryptos to add to your portfolio:</p>
+        <p>Review and finalize the cryptocurrencies to add to your portfolio:</p>
         <ul>
           <li v-for="crypto in selectedCryptos" :key="crypto.product_id">
             {{ crypto.label }}

@@ -53,3 +53,8 @@ export const getRawBuyingMetrics = async (
   };
 };
 
+export const convertCurrencyToNumber = (currency: string) => {
+  const numericValue = parseFloat(currency.replace("$", ""))
+  return numericValue;
+}
+

@@ -1,6 +1,14 @@
 <template>
   <div class="transaction-list">
+    <div
+      v-if="!formattedTransactions?.length"
+      class="flex flex-column justify-content-center align-items-center border-1 border-round border-gray-300 p-5 w-full"
+    >
+      <h3 class="text-xl font-semibold">Come Back Soon!</h3>
+      <p class="mt-0">It looks like your assistant has yet to perform a transaction.</p>
+    </div>
     <DataTable
+    v-else
       v-model:filters="filters"
       :value="formattedTransactions"
       :paginator="true"
@@ -38,7 +46,7 @@
       <Column field="balance" header="Balance" sortable />
       <template #footer>
         In total there are
-        {{ transactions ? transactions.length : 0 }} Transactions.
+        {{ transactions?.length }} Transactions.
       </template>
     </DataTable>
   </div>

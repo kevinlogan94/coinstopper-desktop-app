@@ -187,7 +187,7 @@ ipcMain.handle(
 
       // Filter and map crypto products with additional details
       const cryptoDetails: Array<CryptoDetails> = productResponse.products
-        .filter((product: AdvTradeProduct) => product.quote_currency_id === "USD")
+        .filter((product: AdvTradeProduct) => product.quote_currency_id === "USDC")
         .map((product: AdvTradeProduct) => {
           const cryptoBalance = cryptoBalances.find(
             (balance) => balance.currency === product.base_currency_id

@@ -33,8 +33,7 @@
       </div>
       <!-- Position List -->
       <PositionList
-        v-if="cryptoMetrics"
-        :coin-symbol="crypto.base_name"
+        :coin-symbol="crypto?.base_name"
         :positions="cryptoMetrics?.positions"
       />
     </template>
@@ -119,7 +118,7 @@ const organizeTrackerFileConfig = async () => {
 
 <style scoped>
 .view-crypto {
-  max-width: 800px;
+  min-width: 600px;
   margin: 0 auto;
   padding: 1rem;
 }

@@ -81,6 +81,7 @@ export interface PositionMetrics {
   plAmount: number; // Profit/Loss amount (from Position)
   plPercentage: number; // Profit/Loss percentage (from Position)
   wasSold: boolean; // Indicates if this position has been sold
+  timeStamp: string; //Indicates when either the buy or sell taken place. Whichever happened later.
 }
 
 /**
@@ -125,7 +126,8 @@ export const getTrackerMetricsByProfileId = async (
       invested: position.buyOrder.currencyAmount,
       plAmount: position.plAmount,
       plPercentage: position.plPercentage,
-      wasSold: position.sellOrder !== null,
+      wasSold: !!position?.sellOrder,
+      timeStamp: position?.sellOrder ? position.sellOrder.timestamp : position.buyOrder.timestamp
     }));
 
     // Store aggregated metrics for this coin

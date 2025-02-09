@@ -1,12 +1,21 @@
 <template>
   <div class="position-list">
+    <!-- Add Loading Indicator -->
+    <div
+      v-if="!positions?.length"
+      class="flex flex-column justify-content-center align-items-center border-1 border-round border-gray-300 p-5 w-full"
+    >
+      <h3 class="text-xl font-semibold">Come Back Soon!</h3>
+      <p class="mt-0">It looks like your assistant has yet to make a buy.</p>
+    </div>
     <DataTable
+      v-else
       v-model:filters="filters"
       :value="formattedPositions"
       :paginator="true"
       :rows="5"
       class="w-full"
-      :globalFilterFields="['buyPrice', 'invested', 'plAmount', 'plPercentage']"
+      :globalFilterFields="['timeStamp', 'buyPrice', 'invested', 'plAmount', 'plPercentage', 'wasSold']"
     >
       <template #header>
         <div
@@ -26,28 +35,15 @@
           </IconField>
         </div>
       </template>
-
-      <Column field="buyPrice" header="Buy Price" sortable>
-        <template #body="slotProps">
-          {{ formatNumber(slotProps.data.buyPrice, { currency: true }) }}
-        </template>
-      </Column>
-
-      <Column field="invested" header="Invested Amount" sortable>
-        <template #body="slotProps">
-          {{ formatNumber(slotProps.data.invested, { currency: true }) }}
-        </template>
-      </Column>
-
+      <Column field="timeStamp" header="Timestamp" sortable />
+      <Column field="buyPrice" header="Buy Price" sortable />
+      <Column field="invested" header="Invested Amount" sortable />
       <Column field="plAmount" header="Profit/Loss" sortable>
         <template #body="slotProps">
           <span
-            :class="{
-              'text-green-500': slotProps.data.plAmount > 0,
-              'text-red-500': slotProps.data.plAmount < 0,
-            }"
+            :class=getPLClass(slotProps.data.plAmount)
           >
-            {{ formatNumber(slotProps.data.plAmount, { currency: true }) }}
+            {{ slotProps.data.plAmount}}
           </span>
         </template>
       </Column>
@@ -56,7 +52,7 @@
         <template #body="slotProps">
           <Tag
             :value="
-              formatNumber(slotProps.data.plPercentage, { percentage: true })
+              slotProps.data.plPercentage
             "
             :severity="getPLSeverity(slotProps.data.plPercentage)"
           />
@@ -72,7 +68,7 @@
         </template>
       </Column>
 
-      <template #footer> Total Positions: {{ positions.length }} </template>
+      <template #footer> Total Positions: {{ positions?.length }} </template>
     </DataTable>
   </div>
 </template>
@@ -88,21 +84,38 @@ import InputIcon from "primevue/inputicon";
 import { FilterMatchMode } from "primevue/api";
 import { PositionMetrics } from "main/services/trackerFileManager";
 import { formatNumber } from "@/filters/FormatNumber";
+import { formatDate } from "@/filters/FormatDate";
+import { convertCurrencyToNumber } from "@/helpers/Helpers";
 
-const props = defineProps<{
-  coinSymbol: string;
-  positions: PositionMetrics[];
-}>();
+const props = defineProps({
+  coinSymbol: String,
+  positions: {
+    type: Array<PositionMetrics>,
+    default: [],
+  },
+});
 
-const formattedPositions = computed(() => props.positions);
+const formattedPositions = computed(() => props.positions.map((p) => ({
+    ...p,
+    timeStamp: formatDate(p.timeStamp), // Format timestamp without mutating original data
+    buyPrice: formatNumber(p.buyPrice, { currency: true }),
+    plAmount: formatNumber(p.plAmount, { currency: true }),
+    plPercentage: formatNumber(p.plPercentage, {percentage: true}),
+    invested: formatNumber(p.invested, { currency: true }),
+  })));
 
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 
-const getPLSeverity = (plPercentage: number) => {
-  if (plPercentage > 0) return "success";
-  if (plPercentage < 0) return "danger";
+const getPLClass = (plAmount: string) => {
+  const currencyNumber = convertCurrencyToNumber(plAmount);
+  return currencyNumber > 0 ? "text-green-500" : "text-red-500"
+}
+const getPLSeverity = (plPercentage: string) => {
+  const percentage = parseFloat(plPercentage);
+  if (percentage > 0) return "success";
+  if (percentage < 0) return "danger";
   return "warning";
 };
 </script>
@@ -110,5 +123,6 @@ const getPLSeverity = (plPercentage: number) => {
 <style scoped>
 .position-list {
   margin-top: 1rem;
+  min-width: 800px;
 }
 </style>
