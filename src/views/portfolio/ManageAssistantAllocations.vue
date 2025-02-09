@@ -5,7 +5,6 @@
     </template>
 
     <template #content>
-      <Steps :model="steps" v-model:activeStep="currentStep" class="mb-4" />
 
       <!-- Step 1: Allocate or Withdraw from Assistant -->
       <div v-if="currentStep === 0" class="step-content">
@@ -61,31 +60,32 @@
         </p>
         <p>Do you want to proceed?</p>
       </div>
+      <div>
+        <Button
+            v-if="currentStep > 0"
+            label="Back"
+            class="p-button-secondary"
+            @click="goToStep(currentStep - 1)"
+          />
+          <Button
+            v-if="currentStep < steps.length - 1"
+            label="Next"
+            :disabled="
+              currentStep === 0 && (!amount || amount <= 0 || amount > maxAmount)
+            "
+            @click="goToStep(currentStep + 1)"
+          />
+          <Button
+            v-if="currentStep === steps.length - 1"
+            label="Finalize"
+            class="p-button-success"
+            @click="finalize"
+          />
+      </div>
     </template>
 
     <template #footer>
-      <div class="card-footer">
-        <Button
-          v-if="currentStep > 0"
-          label="Back"
-          class="p-button-secondary"
-          @click="goToStep(currentStep - 1)"
-        />
-        <Button
-          v-if="currentStep < steps.length - 1"
-          label="Next"
-          :disabled="
-            currentStep === 0 && (!amount || amount <= 0 || amount > maxAmount)
-          "
-          @click="goToStep(currentStep + 1)"
-        />
-        <Button
-          v-if="currentStep === steps.length - 1"
-          label="Finalize"
-          class="p-button-success"
-          @click="finalize"
-        />
-      </div>
+      <Steps :model="steps" v-model:activeStep="currentStep" class="mb-4" />
     </template>
   </Card>
 </template>

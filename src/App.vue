@@ -5,8 +5,6 @@
   >
     <router-view />
     <footer class="footer text-center">
-      <Button icon="pi pi-refresh" text @click="refreshApp" />
-      <Button icon="pi pi-sync" text @click="restartApp" />
       <p class="text-sm text-gray-400">Version {{ version }}</p>
     </footer>
   </div>
@@ -23,10 +21,6 @@ const version: string = packageInfo.version;
 
 console.log('👋 This message is being logged by "App.vue", included via Vite');
 
-const refreshApp = () => {
-  window.electronAPI.refreshApp();
-};
-
 onMounted(async () => {
 
   //Turn on trading assistants if they aren't already
@@ -41,11 +35,6 @@ onMounted(async () => {
     }
   });
 });
-
-const restartApp = async () => {
-  await router.push("/");
-  await window.electronAPI.refreshApp();
-};
 
 const displayCenteredLayout = computed(() => {
   return router.currentRoute.value.name != "portfolio";

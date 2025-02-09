@@ -41,7 +41,11 @@
       </div>
       <!-- KPIs -->
       <div class="flex flex-wrap gap-3 justify-content-between mb-3">
-        <Card v-for="kpi in kpis" :key="kpi.label" class="kpi-card flex-1 bg-gray-850">
+        <Card
+          v-for="kpi in kpis"
+          :key="kpi.label"
+          class="kpi-card flex-1 bg-gray-850"
+        >
           <template #content>
             <p class="text-sm text-color-secondary">{{ kpi.label }}</p>
             <p
@@ -64,11 +68,10 @@
               <div class="flex align-items-center">
                 <span>Buying Power</span>
                 <i
-                  class="ml-2 text-primary pi pi-info-circle"
+                  class="ml-2 text-primary pi pi-info-circle cursor-pointer"
                   v-tooltip="
-                    'Buying Power represents the amount you can invest in the trading assistant.'
+                    'Buying Power represents the amount you can allocate to the trading assistant.'
                   "
-                  style="cursor: pointer"
                 ></i>
               </div>
               <span class="text-right font-bold text-green-500">{{
@@ -84,11 +87,10 @@
             <div class="flex justify-content-between">
               <span
                 >Held by Smart Trading Assistant<i
-                  class="ml-1 text-primary pi pi-info-circle"
+                  class="ml-1 text-primary pi pi-info-circle cursor-pointer"
                   v-tooltip="
                     'Funds for the trading assistance to invest for you.'
                   "
-                  style="cursor: pointer"
                 ></i>
                 :</span
               >
@@ -121,8 +123,14 @@
     <!-- Right Side Bar -->
     <div class="flex w-4 p-5 crypto-list">
       <ul class="p-0 w-7 m-0">
-        <li class="flex p-1 slim-border bg-gray-850">
-          <p class="m-1">Cryptocurrencies</p>
+        <li class="flex p-1 slim-border bg-gray-850 align-items-center justify-content-between">
+          <p class="m-0 ml-1">Cryptocurrencies</p>
+          <Button
+            icon="pi pi-plus"
+            severity="info"
+            text
+            @click="goToAddCrypto"
+          ></Button>
         </li>
         <li
           v-for="(currency, index) in cryptocurrencies"
@@ -149,9 +157,6 @@
               {{ currency.priceChangePercentage24h }}%
             </p>
           </div>
-        </li>
-        <li class="flex justify-content-center align-items-center slim-border-bottom bg-gray-850">
-          <Button @click="goToAddCrypto" class="m-3">Add</Button>
         </li>
       </ul>
     </div>
@@ -274,11 +279,17 @@ const organizeKpis = async () => {
   kpis.value = [
     {
       label: "Total Profit/Loss",
-      value: rawMetrics.totalPL != 0 ? formatNumber(rawMetrics.totalPL, { currency: true }) : "N/A",
+      value:
+        rawMetrics.totalPL != 0
+          ? formatNumber(rawMetrics.totalPL, { currency: true })
+          : "N/A",
     },
     {
       label: "ROI",
-      value: rawMetrics.roiPercentage != 0 ? formatNumber(rawMetrics.roiPercentage, { percentage: true }) : "N/A",
+      value:
+        rawMetrics.roiPercentage != 0
+          ? formatNumber(rawMetrics.roiPercentage, { percentage: true })
+          : "N/A",
     },
     {
       label: "Held By Assistant",
@@ -329,7 +340,7 @@ const goToWithdrawFromAssistant = () => {
   border: 1px solid #383838; /* Custom half-pixel transparent border */
   border-bottom: none;
 }
-.slim-border-bottom {
+li:last-child {
   border: 1px solid #383838; /* Custom half-pixel transparent border */
 }
 </style>
