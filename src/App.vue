@@ -11,7 +11,6 @@
 </template>
 
 <script lang="ts" setup>
-import Button from "primevue/button";
 import packageInfo from "../package.json";
 import router from "./router";
 import { computed, onMounted } from "vue";
@@ -22,9 +21,13 @@ const version: string = packageInfo.version;
 console.log('👋 This message is being logged by "App.vue", included via Vite');
 
 onMounted(async () => {
+  startTradingAssistantPerProfile();
+});
 
-  //Turn on trading assistants if they aren't already
-  const profiles = await getAllProfiles();
+
+const startTradingAssistantPerProfile = async () => {
+ //Turn on trading assistants if they aren't already
+ const profiles = await getAllProfiles();
   profiles.forEach(async (profile) => {
     if (
       profile?.appConfig?.trackerEnabled &&
@@ -34,7 +37,7 @@ onMounted(async () => {
       window.electronAPI.startTradingAssistant(profile.id);
     }
   });
-});
+}
 
 const displayCenteredLayout = computed(() => {
   return router.currentRoute.value.name != "portfolio";

@@ -37,7 +37,6 @@ onMounted(async () => {
   if (profiles.value.length) {
     router.push({name: "profileList"});
   }
-  console.log(profiles.value);
 });
 
 const onCreateProfile = async (): Promise<void> => {
