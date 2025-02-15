@@ -13,7 +13,7 @@ interface Window {
         getCoinbaseCryptoProductData: (apiKey: string, apiSecret: string) => Promise<Array<CryptoDetails>>,
         getAllCoinbaseCrypto: (apiKey: string, apiSecret: string) => Promise<Array<CryptoDetails>>,
         startTradingAssistant: (profileId: string) => Promise<void>,
-        stopTradingAssistant: (profileId: string) => void,
+        stopTradingAssistant: (profileId: string) => Prominse<void>,
         isTradingAssistantRunning: (profileId: string) => Promise<boolean>,
         getTrackersByProfileId: (profileId: string) => Promise<{ [symbol: string]: TrackerConfig }>,
         getTrackerMetricsByProfileId: (profileId: string) => Promise<ProfileTrackerMetrics>,

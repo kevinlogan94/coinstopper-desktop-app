@@ -1,16 +1,16 @@
 <template>
   <Dialog
     :visible="visible"
-    :modal="true"
+    modal
     :closable="false"
     class="w-7"
     @hide="closeModal"
     @show="setupModal"
+    :header="getHeader"
   >
     <!-- Step 1: Setup Smart Trading Assistant -->
-    <Card v-if="currentStep === 1" class="modal-card">
-      <template #title> Meet Your Smart Trading Assistant </template>
-      <template #content>
+    <div v-if="currentStep === 1" class="modal-content">
+      <div class="modal-body">
         <p>
           Your Smart Trading Assistant is an automated trading system that
           actively manages your investments based on market conditions. Instead
@@ -30,18 +30,15 @@
           </li>
         </ul>
         <p>Your Smart Trading Assistant is Ready!</p>
-      </template>
-      <template #footer>
-        <div class="modal-actions">
-          <Button label="Next" @click="goToStep(2)" />
-        </div>
-      </template>
-    </Card>
+      </div>
+      <div class="modal-actions">
+        <Button label="Next" @click="goToStep(2)" />
+      </div>
+    </div>
 
     <!-- Step 2: Add Initial Investment -->
-    <Card v-else-if="currentStep === 2" class="modal-card">
-      <template #title> Allocate USDC to your Assistant </template>
-      <template #content>
+    <div v-else-if="currentStep === 2" class="modal-content">
+      <div class="modal-body">
         <p>How much do you want to allocate for your assistant to manage?</p>
 
         <p>
@@ -67,23 +64,20 @@
           mode="currency"
           placeholder="$0.00"
         />
-      </template>
-      <template #footer>
-        <div class="modal-actions">
-          <Button label="Back" severity="secondary" @click="goToStep(1)" />
-          <Button
-            label="Next"
-            :disabled="!investmentAmount"
-            @click="goToStep(3)"
-          />
-        </div>
-      </template>
-    </Card>
+      </div>
+      <div class="modal-actions">
+        <Button label="Back" severity="secondary" @click="goToStep(1)" />
+        <Button
+          label="Next"
+          :disabled="!investmentAmount"
+          @click="goToStep(3)"
+        />
+      </div>
+    </div>
 
     <!-- Step 3: Choose Cryptocurrency -->
-    <Card v-else-if="currentStep === 3" class="modal-card">
-      <template #title> Select Your First Cryptocurrency </template>
-      <template #content>
+    <div v-else-if="currentStep === 3" class="modal-content">
+      <div class="modal-body">
         <p>Choose a cryptocurrency to start with.</p>
 
         <Dropdown
@@ -97,23 +91,20 @@
         <small class="block mt-2 text-sm text-500">
           You can add more cryptocurrencies anytime.
         </small>
-      </template>
-      <template #footer>
-        <div class="modal-actions">
-          <Button label="Back" severity="secondary" @click="goToStep(2)" />
-          <Button
-            label="Next"
-            :disabled="!selectedCrypto"
-            @click="goToStep(4)"
-          />
-        </div>
-      </template>
-    </Card>
+      </div>
+      <div class="modal-actions">
+        <Button label="Back" severity="secondary" @click="goToStep(2)" />
+        <Button
+          label="Next"
+          :disabled="!selectedCrypto"
+          @click="goToStep(4)"
+        />
+      </div>
+    </div>
 
     <!-- Step 4: Confirmation -->
-    <Card v-else-if="currentStep === 4" class="modal-card">
-      <template #title> Review & Start Trading </template>
-      <template #content>
+    <div v-else-if="currentStep === 4" class="modal-content">
+      <div class="modal-body">
         <p>
           You're all set! Here's a summary of your setup. If everything looks
           good, start trading now. You can always adjust these settings later.
@@ -125,22 +116,20 @@
           </li>
           <li><strong>Cryptocurrency:</strong> {{ selectedCrypto.label }}</li>
         </ul>
-      </template>
-      <template #footer>
-        <div class="modal-actions">
-          <Button
-            label="Back"
-            class="p-button-secondary"
-            @click="goToStep(3)"
-          />
-          <Button
-            label="Start Trading"
-            severity="success"
-            @click="finishSetup"
-          />
-        </div>
-      </template>
-    </Card>
+      </div>
+      <div class="modal-actions">
+        <Button
+          label="Back"
+          class="p-button-secondary"
+          @click="goToStep(3)"
+        />
+        <Button
+          label="Start Trading"
+          severity="success"
+          @click="finishSetup"
+        />
+      </div>
+    </div>
 
     <Steps
       :model="steps"
@@ -155,7 +144,6 @@ import { ref, defineProps, defineEmits, computed } from "vue";
 import Dropdown from "primevue/dropdown";
 import InputNumber from "primevue/inputnumber";
 import Button from "primevue/button";
-import Card from "primevue/card";
 import Dialog from "primevue/dialog";
 import Steps from "primevue/steps";
 import { updateProfile } from "@/helpers/AppDataHelper";
@@ -165,6 +153,7 @@ import {
   getCoinbaseBalanceByProfileId,
 } from "@/helpers/CoinbaseHelper";
 import { formatNumber } from "@/filters/FormatNumber";
+import { startTradingAssistant } from "@/helpers/ElectronHelper";
 
 const props = defineProps({
   visible: {
@@ -185,7 +174,7 @@ const emits = defineEmits(["close", "setupCompleted"]);
 const currentStep = ref(1);
 const selectedCrypto = ref<{ label: string; value: string }>({
   label: "Bitcoin",
-  value: "BTC-USD",
+  value: "BTC-USDC",
 });
 const investmentAmount = ref(0);
 const stepComponentStep = computed(() => currentStep.value - 1);
@@ -199,6 +188,21 @@ const steps = [
   { label: "Review & Start" },
 ];
 
+const getHeader = computed(() => {
+  switch (currentStep.value) {
+    case 1:
+      return "Meet Your Smart Trading Assistant";
+    case 2:
+      return "Allocate USDC to your Assistant";
+    case 3:
+      return "Select Your First Cryptocurrency";
+    case 4:
+      return "Review & Start Trading";
+    default:
+      return "";
+  }
+});
+
 const goToStep = (step: number) => {
   currentStep.value = step;
 };
@@ -209,6 +213,8 @@ const finishSetup = async () => {
     profile.trackerConfig.initialDeposit = investmentAmount.value;
     profile.trackerConfig.whiteList = [selectedCrypto.value.value];
   });
+
+  await startTradingAssistant(props.profileId);
 
   closeModal();
 };
@@ -245,8 +251,7 @@ const closeModal = () => {
   margin-top: 1rem;
 }
 
-.p-card {
-  box-shadow: none;
-  margin: 0;
+.modal-content {
+  margin: 1rem;
 }
 </style>

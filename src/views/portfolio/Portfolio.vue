@@ -190,6 +190,7 @@ import { getBuyingMetrics } from "@/helpers/Helpers";
 import TransactionList from "@/components/portfolio/TransactionList.vue";
 import Card from "primevue/card";
 import { LabelValuePair } from "@/models";
+import { startTradingAssistant, stopTradingAssistant } from '@/helpers/ElectronHelper';
 
 const displayOnboardingModal = ref<boolean>(false);
 const showSetupMessage = ref<boolean>(true);
@@ -300,12 +301,13 @@ const organizeKpis = async () => {
 };
 
 const toggleTradingAssistant = async () => {
-  await updateProfile(props.profileId, (profile) => {
+  await updateProfile(props.profileId, async (profile) => {
     profile.appConfig.trackerEnabled = !profile.appConfig.trackerEnabled;
+
     if (profile.appConfig.trackerEnabled) {
-      window.electronAPI.startTradingAssistant(props.profileId);
+      await startTradingAssistant(props.profileId);
     } else {
-      window.electronAPI.stopTradingAssistant(props.profileId);
+      await stopTradingAssistant(props.profileId);
     }
   });
   profile.value = await getProfile(props.profileId);

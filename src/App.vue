@@ -15,6 +15,7 @@ import packageInfo from "../package.json";
 import router from "./router";
 import { computed, onMounted } from "vue";
 import { getAllProfiles } from "./helpers/AppDataHelper";
+import { isTradingAssistantRunning, startTradingAssistant } from '@/helpers/ElectronHelper';
 
 const version: string = packageInfo.version;
 
@@ -31,10 +32,10 @@ const startTradingAssistantPerProfile = async () => {
   profiles.forEach(async (profile) => {
     if (
       profile?.appConfig?.trackerEnabled &&
-      !(await window.electronAPI.isTradingAssistantRunning(profile.id))
+      !(await isTradingAssistantRunning(profile.id))
     ) {
       console.log(profile.appConfig.trackerEnabled);
-      window.electronAPI.startTradingAssistant(profile.id);
+      await startTradingAssistant(profile.id);
     }
   });
 }

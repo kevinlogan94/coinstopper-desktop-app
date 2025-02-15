@@ -1,5 +1,8 @@
 import { formatNumber } from "@/filters/FormatNumber";
-import { getBalanceHeldByAssistentByProfileId, getProfile } from "./AppDataHelper";
+import {
+  getBalanceHeldByAssistentByProfileId,
+  getProfile,
+} from "./AppDataHelper";
 import { getCoinbaseBalanceByProfileId } from "./CoinbaseHelper";
 import { readAppData } from "@/helpers/ElectronHelper";
 import { Profile } from "main/models";
@@ -25,12 +28,16 @@ export interface RawBuyingMetrics {
 export const getBuyingMetrics = async (
   profileId: string
 ): Promise<BuyingMetrics> => {
-  const RawBuyingMetrics = await getRawBuyingMetrics(profileId)
+  const RawBuyingMetrics = await getRawBuyingMetrics(profileId);
 
   // Return formatted values
   return {
-    coinbaseBalance: formatNumber(RawBuyingMetrics.coinbaseBalance, { currency: true }),
-    moneyHeldByAssistant: formatNumber(RawBuyingMetrics.moneyHeldByAssistant, { currency: true }),
+    coinbaseBalance: formatNumber(RawBuyingMetrics.coinbaseBalance, {
+      currency: true,
+    }),
+    moneyHeldByAssistant: formatNumber(RawBuyingMetrics.moneyHeldByAssistant, {
+      currency: true,
+    }),
     buyingPower: formatNumber(RawBuyingMetrics.buyingPower, { currency: true }),
   };
 };
@@ -42,7 +49,9 @@ export const getRawBuyingMetrics = async (
 
   // Fetch raw balances
   const rawCoinbaseBalance = await getCoinbaseBalanceByProfileId(profileId);
-  const balanceHeldByAssistant = await getBalanceHeldByAssistentByProfileId(profileId);
+  const balanceHeldByAssistant = await getBalanceHeldByAssistentByProfileId(
+    profileId
+  );
 
   // Calculate buying power - Make sure we don't get a number below 0.
   const difference = Math.max(rawCoinbaseBalance - balanceHeldByAssistant, 0);
@@ -51,21 +60,27 @@ export const getRawBuyingMetrics = async (
   return {
     coinbaseBalance: rawCoinbaseBalance,
     moneyHeldByAssistant: balanceHeldByAssistant,
-    buyingPower: difference
+    buyingPower: difference,
   };
 };
 
 export const convertCurrencyToNumber = (currency: string) => {
-  const numericValue = parseFloat(currency.replace("$", ""))
+  const numericValue = parseFloat(currency.replace("$", ""));
   return numericValue;
-}
+};
 
-export const validateProfileExistence = async (profileId: string): Promise<Profile> => {
+export const validateProfileExistence = async (
+  profileId: string
+): Promise<Profile> => {
   const appData = await readAppData();
+
+  if (isEmptyObject(appData)) {
+    throw new Error("Empty or invalid AppData file.");
+  }
+
   const profile = appData.profiles.find((profile) => profile.id === profileId);
   if (!profile) {
     throw new Error(`Profile with ID ${profileId} not found.`);
   }
   return profile;
 };
-

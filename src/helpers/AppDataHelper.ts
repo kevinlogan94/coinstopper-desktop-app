@@ -15,11 +15,17 @@ export const updateProfile = async (
       throw new Error("Empty or invalid AppData file.");
     }
 
-    // Validate profile existence
-    const profile = await validateProfileExistence(profileId);
+    // Find the profile by ID
+    const profile = appData.profiles.find(
+      (profile) => profile.id === profileId
+    );
+
+    if (!profile) {
+      throw new Error(`Profile with ID ${profileId} not found.`);
+    }
 
     // Apply the update logic
-    updateProfileObject(profile);
+    await updateProfileObject(profile);
 
     // Write the updated data back to the file
     await writeAppData(appData);
@@ -205,7 +211,10 @@ export async function getBalanceHeldByAssistentByProfileId(
     }
     return ledger[ledger.length - 1].balance;
   } catch (error) {
-    console.error("Error fetching assistant balance by profile ID:", error.message);
+    console.error(
+      "Error fetching assistant balance by profile ID:",
+      error.message
+    );
     throw error;
   }
 }

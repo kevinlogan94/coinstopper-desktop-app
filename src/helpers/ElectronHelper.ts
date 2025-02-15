@@ -28,3 +28,15 @@ export const editTrackerFile = async (
 ): Promise<void> => {
   await window.electronAPI.editTrackerFile(profileId, symbol, updatedConfig);
 };
+
+export const isTradingAssistantRunning = async (profileId: string): Promise<boolean> => {
+  return await window.electronAPI.isTradingAssistantRunning(profileId);
+};
+
+export const startTradingAssistant = async (profileId: string): Promise<void> => {
+  await window.electronAPI.startTradingAssistant(profileId);
+};
+
+export const stopTradingAssistant = async (profileId: string): Promise<void> => {
+  await window.electronAPI.stopTradingAssistant(profileId);
+};
