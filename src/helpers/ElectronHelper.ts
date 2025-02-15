@@ -29,6 +29,10 @@ export const editTrackerFile = async (
   await window.electronAPI.editTrackerFile(profileId, symbol, updatedConfig);
 };
 
+export const getTrackersByProfileId = async (profileId: string): Promise<{ [symbol: string]: TrackerFileConfig }> => {
+  return await window.electronAPI.getTrackersByProfileId(profileId);
+};
+
 export const isTradingAssistantRunning = async (profileId: string): Promise<boolean> => {
   return await window.electronAPI.isTradingAssistantRunning(profileId);
 };
