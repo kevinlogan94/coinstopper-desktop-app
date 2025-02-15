@@ -1,6 +1,8 @@
 import { formatNumber } from "@/filters/FormatNumber";
 import { getBalanceHeldByAssistentByProfileId, getProfile } from "./AppDataHelper";
 import { getCoinbaseBalanceByProfileId } from "./CoinbaseHelper";
+import { readAppData } from "@/helpers/ElectronHelper";
+import { Profile } from "main/models";
 
 export const isEmptyObject = (obj: object): boolean => {
   return (
@@ -57,4 +59,13 @@ export const convertCurrencyToNumber = (currency: string) => {
   const numericValue = parseFloat(currency.replace("$", ""))
   return numericValue;
 }
+
+export const validateProfileExistence = async (profileId: string): Promise<Profile> => {
+  const appData = await readAppData();
+  const profile = appData.profiles.find((profile) => profile.id === profileId);
+  if (!profile) {
+    throw new Error(`Profile with ID ${profileId} not found.`);
+  }
+  return profile;
+};
 

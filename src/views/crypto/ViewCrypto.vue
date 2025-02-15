@@ -66,7 +66,7 @@ import router from "@/router";
 import { getAllCoinbaseCryptoProductDataByProfileId } from "@/helpers/CoinbaseHelper";
 import { formatNumber } from "@/filters/FormatNumber";
 import PositionList from "@/components/crypto/PositionList.vue";
-import { getTrackerMetricsByProfileId } from "@/helpers/ElectronHelper";
+import { getTrackerMetricsByProfileId } from "@/helpers/TrackerFileHelper";
 import { CoinTrackerMetrics } from "main/services/trackerFileManager";
 import { CryptoDetails } from "main/services/coinbase";
 import { LabelValuePair } from "@/models";

@@ -1,6 +1,7 @@
 import { readAppData, writeAppData } from "@/helpers/ElectronHelper";
 import { isEmptyObject } from "./Helpers";
 import { Profile, Credential, Transaction } from "main/models";
+import { validateProfileExistence } from "@/helpers/Helpers";
 
 export const updateProfile = async (
   profileId: string,
@@ -14,14 +15,8 @@ export const updateProfile = async (
       throw new Error("Empty or invalid AppData file.");
     }
 
-    // Find the profile by ID
-    const profile = appData.profiles.find(
-      (profile) => profile.id === profileId
-    );
-
-    if (!profile) {
-      throw new Error(`Profile with ID ${profileId} not found.`);
-    }
+    // Validate profile existence
+    const profile = await validateProfileExistence(profileId);
 
     // Apply the update logic
     updateProfileObject(profile);
@@ -35,23 +30,8 @@ export const updateProfile = async (
 
 export const getProfile = async (profileId: string): Promise<Profile> => {
   try {
-    // Read the application data
-    const appData = await readAppData();
-
-    if (isEmptyObject(appData)) {
-      throw new Error("Empty or invalid AppData file.");
-    }
-
-    // Find the profile by ID
-    const profile = appData.profiles.find(
-      (profile) => profile.id === profileId
-    );
-
-    if (!profile) {
-      throw new Error(`Profile with ID ${profileId} not found.`);
-    }
-
-    return profile;
+    // Validate profile existence
+    return await validateProfileExistence(profileId);
   } catch (error) {
     console.error("Error in getProfile:", error.message);
     throw error; // Propagate the error to the caller

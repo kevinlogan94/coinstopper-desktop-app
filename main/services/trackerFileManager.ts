@@ -3,9 +3,41 @@ import fs from "fs/promises";
 import path from "path";
 import { TrackerFileConfig } from "../models";
 
+// models ----------------------------------------------------------------------------
+
 export interface ProfileTrackers {
   [profileId: string]: { [symbol: string]: TrackerFileConfig };
 }
+
+export interface ProfileTrackerMetrics {
+  totalInvested: number; // Total dollar amount ever invested (sum of all buyOrder.currencyAmount)
+  currentPortfolioValue: number; // Current portfolio value of held assets (heldValueUsd)
+  totalPL: number; // Total profit/loss amount across all active holdings
+  roiPercentage: number; // Overall return on investment percentage
+  availableFunds: number; // Total funds available for investment
+  winningTrades: number; // Count of positions that were profitable
+  losingTrades: number; // Count of positions that were unprofitable
+  individualCoinMetrics: { [symbol: string]: CoinTrackerMetrics }; // Metrics per coin
+}
+
+export interface CoinTrackerMetrics {
+  totalInvested: number; // Total dollar amount invested in this coin (sum of all buyOrder.currencyAmount)
+  heldValueUsd: number; // Current value of holdings in this coin (real-time `held * currentPrice`)
+  held: number; // Current amount of coin held
+  plAmount: number; // Profit/loss amount (sum of all position plAmounts)
+  plPercentage: number; // Calculated as `plAmount / totalInvested * 100`
+  positions: PositionMetrics[]; // Detailed per-position metrics
+}
+
+export interface PositionMetrics {
+  buyPrice: number;
+  invested: number; // Amount invested in this position
+  plAmount: number; // Profit/Loss amount (from Position)
+  plPercentage: number; // Profit/Loss percentage (from Position)
+  wasSold: boolean; // Indicates if this position has been sold
+  timeStamp: string; //Indicates when either the buy or sell taken place. Whichever happened later.
+}
+// ----------------------------------------------------------------------------
 
 export const getTrackerConfigs = async (): Promise<ProfileTrackers> => {
   const userDataPath = app.getPath("userData");
@@ -54,35 +86,6 @@ export const getTrackersByProfileId = async (
   const allTrackers = await getTrackerConfigs();
   return allTrackers[profileId] || {};
 };
-
-export interface ProfileTrackerMetrics {
-  totalInvested: number; // Total dollar amount ever invested (sum of all buyOrder.currencyAmount)
-  currentPortfolioValue: number; // Current portfolio value of held assets (heldValueUsd)
-  totalPL: number; // Total profit/loss amount across all active holdings
-  roiPercentage: number; // Overall return on investment percentage
-  availableFunds: number; // Total funds available for investment
-  winningTrades: number; // Count of positions that were profitable
-  losingTrades: number; // Count of positions that were unprofitable
-  individualCoinMetrics: { [symbol: string]: CoinTrackerMetrics }; // Metrics per coin
-}
-
-export interface CoinTrackerMetrics {
-  totalInvested: number; // Total dollar amount invested in this coin (sum of all buyOrder.currencyAmount)
-  heldValueUsd: number; // Current value of holdings in this coin (real-time `held * currentPrice`)
-  held: number; // Current amount of coin held
-  plAmount: number; // Profit/loss amount (sum of all position plAmounts)
-  plPercentage: number; // Calculated as `plAmount / totalInvested * 100`
-  positions: PositionMetrics[]; // Detailed per-position metrics
-}
-
-export interface PositionMetrics {
-  buyPrice: number;
-  invested: number; // Amount invested in this position
-  plAmount: number; // Profit/Loss amount (from Position)
-  plPercentage: number; // Profit/Loss percentage (from Position)
-  wasSold: boolean; // Indicates if this position has been sold
-  timeStamp: string; //Indicates when either the buy or sell taken place. Whichever happened later.
-}
 
 /**
  * Retrieves tracker metrics for a given profile ID.
@@ -169,14 +172,66 @@ export const getTrackerMetricsByProfileId = async (
   };
 };
 
+export const createTrackerFile = async (
+  profileId: string,
+  symbol: string,
+  trackerConfig: TrackerFileConfig
+): Promise<void> => {
+  const userDataPath = app.getPath("userData");
+  const filePath = path.join(userDataPath, "trackers", profileId, `${symbol}.json`);
+
+  try {
+    await fs.writeFile(filePath, JSON.stringify(trackerConfig, null, 2), "utf-8");
+    console.log(`Tracker file created at ${filePath}`);
+  } catch (error) {
+    console.error(`Error creating tracker file at ${filePath}:`, error);
+  }
+};
+
+export const editTrackerFile = async (
+  profileId: string,
+  symbol: string,
+  updatedConfig: TrackerFileConfig
+): Promise<void> => {
+  const profiles = await getTrackerConfigs();
+  const userDataPath = app.getPath("userData");
+  const filePath = path.join(userDataPath, "trackers", profileId, `${symbol}.json`);
+
+  if (profiles[profileId] && profiles[profileId][symbol]) {
+    try {
+      await fs.writeFile(filePath, JSON.stringify(updatedConfig, null, 2), "utf-8");
+      console.log(`Tracker file updated at ${filePath}`);
+    } catch (error) {
+      console.error(`Error updating tracker file at ${filePath}:`, error);
+    }
+  } else {
+    console.error(`Tracker file for profileId: ${profileId} and symbol: ${symbol} not found.`);
+  }
+};
+
 export const registerTrackerFileManagementMethods = () => {
   ipcMain.handle("get-trackers-by-profile-id", (event, profileId: string) => {
     return getTrackersByProfileId(profileId);
   });
+
   ipcMain.handle(
     "get-tracker-metrics-by-profile-id",
     (event, profileId: string) => {
       return getTrackerMetricsByProfileId(profileId);
+    }
+  );
+
+  ipcMain.handle(
+    "create-tracker-file",
+    (event, profileId: string, symbol: string, trackerConfig: TrackerFileConfig) => {
+      return createTrackerFile(profileId, symbol, trackerConfig);
+    }
+  );
+
+  ipcMain.handle(
+    "edit-tracker-file",
+    (event, profileId: string, symbol: string, updatedConfig: TrackerFileConfig) => {
+      return editTrackerFile(profileId, symbol, updatedConfig);
     }
   );
 };
