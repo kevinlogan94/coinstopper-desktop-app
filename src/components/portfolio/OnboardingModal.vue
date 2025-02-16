@@ -154,6 +154,7 @@ import {
 } from "@/helpers/CoinbaseHelper";
 import { formatNumber } from "@/filters/FormatNumber";
 import { startTradingAssistant } from "@/helpers/ElectronHelper";
+import { createNewTrackerFile } from "@/helpers/TrackerFileHelper";
 
 const props = defineProps({
   visible: {
@@ -213,6 +214,7 @@ const finishSetup = async () => {
     profile.trackerConfig.initialDeposit = investmentAmount.value;
     profile.trackerConfig.whiteList = [selectedCrypto.value.value];
   });
+  await createNewTrackerFile(props.profileId, selectedCrypto.value.value);
 
   await startTradingAssistant(props.profileId);
 

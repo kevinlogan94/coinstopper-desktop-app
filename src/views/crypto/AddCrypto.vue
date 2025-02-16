@@ -20,7 +20,7 @@
       <div v-else-if="currentStep === 2" class="step-content">
         <p>Review and finalize the cryptocurrencies to add to your portfolio:</p>
         <ul>
-          <li v-for="crypto in selectedCryptos" :key="crypto.product_id">
+          <li v-for="crypto in selectedCryptos" :key="crypto.value">
             {{ crypto.label }}
           </li>
         </ul>
@@ -67,12 +67,14 @@ import MultiSelect from "primevue/multiselect";
 import { getAllCoinbaseCryptoProductDataByProfileId } from "@/helpers/CoinbaseHelper";
 import router from "@/router";
 import { getProfile, updateProfile } from "@/helpers/AppDataHelper";
+import { createNewTrackerFile } from "@/helpers/TrackerFileHelper";
+import { LabelValuePair } from "@/models";
 
 const props = defineProps<{ profileId: string }>();
 
 const currentStep = ref(1);
-const selectedCryptos = ref([]);
-const cryptoOptions = ref([]);
+const selectedCryptos = ref<Array<LabelValuePair>>([]);
+const cryptoOptions = ref<Array<LabelValuePair>>([]);
 
 const stepComponentStep = computed(() => currentStep.value - 1);
 const steps = [{ label: "Add Crypto" }, { label: "Finalize" }];
@@ -88,6 +90,10 @@ const finalizeCryptos = async () => {
     profile.trackerConfig.whiteList.push(...whiteListAdditions);
   });
   router.push({ name: "portfolio", params: { profileId: props.profileId } });
+
+  for (const selectedCrypto of selectedCryptos.value) {
+    await createNewTrackerFile(props.profileId, selectedCrypto.value);
+  }
 };
 
 onMounted(async () => {
