@@ -2,8 +2,7 @@
   <Message v-if="showSetupMessage">
     <div class="flex align-items-center">
       <span
-        >Start investing by choosing your first cryptocurrency and adding an
-        investment.</span
+        >Test Banner for the Onboarding Modal</span
       >
       <Button
         label="Start Setup"
@@ -165,8 +164,8 @@
       :visible="displayOnboardingModal"
       :currentPrice="1000"
       :profile-id="profileId"
-      @close="handleModalClose"
-      @setupCompleted="handleModalClose"
+      @close="handleOnboardingModalClose"
+      @setupCompleted="handleOnboardingModalClose"
     />
   </div>
 </template>
@@ -193,7 +192,7 @@ import { LabelValuePair } from "@/models";
 import { startTradingAssistant, stopTradingAssistant } from '@/helpers/ElectronHelper';
 
 const displayOnboardingModal = ref<boolean>(false);
-const showSetupMessage = ref<boolean>(true);
+const showSetupMessage = ref<boolean>(false);
 const profile = ref<Profile>();
 const isLoading = ref<boolean>();
 
@@ -213,21 +212,37 @@ const cryptocurrencies = ref([]);
 
 const props = defineProps<{ profileId: string }>();
 
-const handleModalClose = () => {
-  displayOnboardingModal.value = false;
-
-  setupPortfolio();
-};
-
 onMounted(async () => {
   await setupPortfolio();
 });
+
+const handleOnboardingModalClose = () => {
+  displayOnboardingModal.value = false;
+  setupPortfolio();
+};
+
+const handleShowingSetupMessage = () => {
+  if (profile.value?.name.includes("test")) {
+    showSetupMessage.value = true;
+  }
+};
+
+const handleOnboardingModalOpen = () => {
+  if (!profile.value?.trackerConfig?.initialDeposit) {
+    displayOnboardingModal.value = true;
+  }
+}
 
 const setupPortfolio = async () => {
   isLoading.value = true;
 
   profile.value = await getProfile(props.profileId);
 
+  //Organize onboarding setup and testing
+  handleShowingSetupMessage();
+  handleOnboardingModalOpen();
+
+  //Organize data on the screen
   organizeLedgerData();
   organizePriceChange();
   organizeBuyingPower();
@@ -313,7 +328,7 @@ const toggleTradingAssistant = async () => {
   profile.value = await getProfile(props.profileId);
 };
 
-// Router methods
+// ----- Router methods -----
 const goToAddCrypto = () => {
   router.push({ name: "addCrypto", params: { profileId: props.profileId } });
 };

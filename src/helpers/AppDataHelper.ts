@@ -96,10 +96,10 @@ export const createProfile = async (
       trackerConfig: {
         blackList: [],
         whiteList: [],
-        initialDeposit: 500,
+        initialDeposit: 0,
         maxAllocation: 500,
         bankReserve: 1,
-        simulationMode: true,
+        simulationMode: false,
       },
       appConfig: {
         trackerEnabled: false,
