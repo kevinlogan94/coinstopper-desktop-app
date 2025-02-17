@@ -331,10 +331,10 @@ const toggleTradingAssistant = async () => {
 const goToAddCrypto = () => {
   router.push({ name: "addCrypto", params: { profileId: props.profileId } });
 };
-const goToViewCrypto = (cryptoId: string) => {
+const goToViewCrypto = (symbol: string) => {
   router.push({
     name: "viewCrypto",
-    params: { profileId: props.profileId, cryptoId: cryptoId },
+    params: { profileId: props.profileId, cryptoId: symbol },
   });
 };
 const goToAllocateToAssistant = () => {

@@ -76,14 +76,45 @@ export const createNewTrackerFile = async (
 export const updateTrackerFile = async (
   profileId: string,
   symbol: string,
-  updatedConfig: TrackerFileConfig
+  updateTrackerConfig: (trackerConfig: TrackerFileConfig) => void
 ): Promise<void> => {
   try {
     await validateProfileExistence(profileId);
-    await editTrackerFile(profileId, symbol, updatedConfig);
+    
+    // Fetch the current tracker file config
+    const trackers = await getTrackersByProfileId(profileId);
+    const currentTrackerConfig = trackers[symbol];
+
+    if (!currentTrackerConfig) {
+      throw new Error(`Tracker file for ${symbol} not found.`);
+    }
+
+    // Apply the update function to the current config
+    updateTrackerConfig(currentTrackerConfig);
+
+    // Edit the tracker file with the updated config
+    await editTrackerFile(profileId, symbol, currentTrackerConfig);
     console.log(`Tracker file for ${symbol} updated successfully.`);
   } catch (error) {
     console.error("Error updating tracker file:", error.message);
+  }
+};
+
+export const getTrackerFileConfig = async (
+  profileId: string, 
+  symbol: string
+): Promise<TrackerFileConfig> => {
+  try {
+    // Validate profile existence
+    await validateProfileExistence(profileId);
+
+    // Get all trackers for the profile
+    const trackers = await getTrackersByProfileId(profileId);
+
+    // Return the specific tracker config for the symbol
+    return trackers[symbol];
+  } catch (error) {
+    console.error(`Error getting tracker file config for ${symbol}:`, error.message);
   }
 };
 

@@ -57,14 +57,18 @@ import router from "@/router";
 import { getAllCoinbaseCryptoProductDataByProfileId } from "@/helpers/CoinbaseHelper";
 import { formatNumber } from "@/filters/FormatNumber";
 import PositionList from "@/components/crypto/PositionList.vue";
-import { getTrackerMetricsByProfileId } from "@/helpers/TrackerFileHelper";
+import {
+  getTrackerMetricsByProfileId,
+  updateTrackerFile,
+  getTrackerFileConfig,
+} from "@/helpers/TrackerFileHelper";
 import { CoinTrackerMetrics } from "main/services/trackerFileManager";
 import { CryptoDetails } from "main/services/coinbase";
 import { LabelValuePair } from "@/models";
 
 const props = defineProps<{ profileId: string; cryptoId: string }>();
 
-const autoBuy = ref(true);
+const autoBuy = ref(false);
 
 const cryptoMetrics = ref<CoinTrackerMetrics>();
 const crypto = ref<CryptoDetails>();
@@ -78,13 +82,25 @@ const goToRemoveCrypto = () => {
 };
 
 const toggleAutoBuying = () => {
-  //toggle auto buying
+  updateTrackerFile(props.profileId, props.cryptoId, (config) => {
+    config.autoBuyInsActive = !config.autoBuyInsActive;
+    autoBuy.value = config.autoBuyInsActive;
+  });
 };
 
 onMounted(async () => {
   organizeCrypto();
   organizeTrackerFileConfig();
+  organizeAutoBuy();
 });
+
+const organizeAutoBuy = async () => {
+  const trackerFileConfig = await getTrackerFileConfig(
+    props.profileId,
+    props.cryptoId
+  );
+  autoBuy.value = trackerFileConfig?.autoBuyInsActive ?? false;
+};
 
 const organizeCrypto = async () => {
   const allAvailableCrypto = await getAllCoinbaseCryptoProductDataByProfileId(
