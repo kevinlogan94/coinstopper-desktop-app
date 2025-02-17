@@ -1,7 +1,7 @@
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 import { contextBridge, ipcRenderer } from 'electron';
-import { AppData, TrackerFileConfig } from './models';
+import { AppData, TrackerFileConfig, Transaction } from './models';
 
 contextBridge.exposeInMainWorld('electronAPI', {
   readAppData: () => ipcRenderer.invoke('read-app-data'),
@@ -19,4 +19,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getTrackerMetricsByProfileId: (profileId: string) => ipcRenderer.invoke("get-tracker-metrics-by-profile-id", profileId),
   createTrackerFile: (profileId: string, symbol: string, trackerConfig: TrackerFileConfig) => ipcRenderer.invoke("create-tracker-file", profileId, symbol, trackerConfig),
   editTrackerFile: (profileId: string, symbol: string, updatedConfig: TrackerFileConfig) => ipcRenderer.invoke("edit-tracker-file", profileId, symbol, updatedConfig),
+  
+  // Ledger methods
+  getLedger: (profileId: string) => ipcRenderer.invoke("get-ledger", profileId),
+  addLedgerTransaction: (profileId: string, transaction: Transaction) => ipcRenderer.invoke("add-ledger-transaction", profileId, transaction),
+  createLedgerFile: (profileId: string, transactions?: Transaction[]) => ipcRenderer.invoke("create-ledger-file", profileId, transactions),
 });

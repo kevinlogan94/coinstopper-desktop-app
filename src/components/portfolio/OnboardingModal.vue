@@ -146,7 +146,8 @@ import InputNumber from "primevue/inputnumber";
 import Button from "primevue/button";
 import Dialog from "primevue/dialog";
 import Steps from "primevue/steps";
-import { updateProfile, addToLedger } from "@/helpers/AppDataHelper";
+import { updateProfile } from "@/helpers/AppDataHelper";
+import { addToLedger } from "@/helpers/LedgerFileHelper";
 import { Profile } from "main/models";
 import {
   getAllCoinbaseCryptoProductDataByProfileId,

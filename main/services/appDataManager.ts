@@ -31,7 +31,16 @@ export const readAppData = (): Record<string, unknown> => {
  */
 export const writeAppData = (data: Record<string, unknown>): void => {
   try {
-    writeFileSync(getDataFilePath(), JSON.stringify(data, null, 2), "utf8");
+    const filePath = getDataFilePath();
+    
+    // Check if file exists before writing
+    const fileExists = require('fs').existsSync(filePath);
+    
+    writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+    
+    if (!fileExists) {
+      console.log(`AppData file created at: ${filePath}`);
+    }
   } catch (error) {
     console.error("Error writing data file:", error);
   }

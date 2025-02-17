@@ -8,7 +8,6 @@ export interface Profile {
   credentials: Array<Credential>;
   trackerConfig: TrackerConfig;
   appConfig: AppConfig;
-  ledger: Array<Transaction>;
 }
 
 export interface Credential {

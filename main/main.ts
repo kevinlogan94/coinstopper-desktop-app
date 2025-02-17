@@ -7,6 +7,7 @@ import { registerMiscellaneousMethods } from "./services/miscellaneous";
 import { registerCoinbaseMethods } from "./services/coinbase";
 import { registerTradingAssistantMethods } from "./services/tradingAssistantManager";
 import { registerTrackerFileManagementMethods } from "./services/trackerFileManager";
+import { registerLedgerFileMethods } from "./services/ledgerFileManager";
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
@@ -194,3 +195,4 @@ registerMiscellaneousMethods();
 registerCoinbaseMethods();
 registerTradingAssistantMethods();
 registerTrackerFileManagementMethods();
+registerLedgerFileMethods();

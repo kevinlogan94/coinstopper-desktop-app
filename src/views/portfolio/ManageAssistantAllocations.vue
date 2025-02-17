@@ -103,7 +103,7 @@ import {
   getRawBuyingMetrics,
   RawBuyingMetrics,
 } from "@/helpers/Helpers";
-import { addToLedger, getLedgerByProfileId } from "@/helpers/AppDataHelper";
+import { addToLedger, getLedgerByProfileId } from "@/helpers/LedgerFileHelper";
 import { Transaction } from "main/models";
 
 const props = defineProps<{ profileId: string; action: "allocate" | "withdraw" }>();

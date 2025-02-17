@@ -2,7 +2,8 @@ import { createTrackerFile, editTrackerFile, fetchTrackerMetricsByProfileId, get
 import { TrackerFileConfig } from "main/models";
 import { validateProfileExistence } from "@/helpers/Helpers";
 import { ProfileTrackerMetrics } from "main/services/trackerFileManager";
-import { getLedgerByProfileId, getProfile } from "./AppDataHelper";
+import { getProfile } from "./AppDataHelper";
+import { getLedgerByProfileId } from "./LedgerFileHelper";
 
 export const createNewTrackerFile = async (
   profileId: string,

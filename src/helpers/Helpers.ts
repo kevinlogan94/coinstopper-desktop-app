@@ -1,8 +1,6 @@
 import { formatNumber } from "@/filters/FormatNumber";
-import {
-  getBalanceHeldByAssistentByProfileId,
-  getProfile,
-} from "./AppDataHelper";
+import { getProfile } from "./AppDataHelper";
+import { getBalanceHeldByAssistentByProfileId } from "./LedgerFileHelper";
 import { getCoinbaseBalanceByProfileId } from "./CoinbaseHelper";
 import { readAppData } from "@/helpers/ElectronHelper";
 import { Profile } from "main/models";

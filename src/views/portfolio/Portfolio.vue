@@ -181,7 +181,6 @@ import AccordionTab from "primevue/accordiontab";
 import OnboardingModal from "@/components/portfolio/OnboardingModal.vue";
 import Message from "primevue/message";
 import {
-  getLedgerByProfileId,
   getProfile,
   updateProfile,
 } from "@/helpers/AppDataHelper";
@@ -196,6 +195,7 @@ import {
   stopTradingAssistant,
 } from "@/helpers/ElectronHelper";
 import { getTrackerMetricsByProfileId } from "@/helpers/TrackerFileHelper";
+import { getLedgerByProfileId } from "@/helpers/LedgerFileHelper";
 
 const displayOnboardingModal = ref<boolean>(false);
 const showSetupMessage = ref<boolean>(false);

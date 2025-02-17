@@ -41,30 +41,36 @@ export interface PositionMetrics {
 
 export const getTrackerConfigs = async (): Promise<ProfileTrackers> => {
   const userDataPath = app.getPath("userData");
-  const trackersPath = path.join(userDataPath, "trackers");
+  const profilesPath = path.join(userDataPath, "profiles");
 
   try {
-    const profileFolders = await fs.readdir(trackersPath);
+    const profileFolders = await fs.readdir(profilesPath);
     const profiles: ProfileTrackers = {};
 
     for (const profileId of profileFolders) {
-      const profilePath = path.join(trackersPath, profileId);
-      const files = await fs.readdir(profilePath);
+      const profilePath = path.join(profilesPath, profileId, "trackers");
+      
+      try {
+        const files = await fs.readdir(profilePath);
 
-      profiles[profileId] = {};
+        profiles[profileId] = {};
 
-      for (const file of files) {
-        if (file.endsWith(".json")) {
-          const filePath = path.join(profilePath, file);
-          try {
-            const jsonData = await fs.readFile(filePath, "utf-8");
-            const trackerConfig: TrackerFileConfig = JSON.parse(jsonData);
-            const symbol = path.basename(file, ".json"); // Extract symbol from filename
-            profiles[profileId][symbol] = trackerConfig;
-          } catch (error) {
-            console.error(`Error parsing ${filePath}:`, error);
+        for (const file of files) {
+          if (file.endsWith(".json")) {
+            const filePath = path.join(profilePath, file);
+            try {
+              const jsonData = await fs.readFile(filePath, "utf-8");
+              const trackerConfig: TrackerFileConfig = JSON.parse(jsonData);
+              const symbol = path.basename(file, ".json"); // Extract symbol from filename
+              profiles[profileId][symbol] = trackerConfig;
+            } catch (error) {
+              console.error(`Error parsing ${filePath}:`, error);
+            }
           }
         }
+      } catch (dirError) {
+        // If trackers directory doesn't exist, skip this profile
+        console.warn(`No trackers directory for profile ${profileId}`);
       }
     }
 
@@ -178,7 +184,7 @@ export const createTrackerFile = async (
   trackerConfig: TrackerFileConfig
 ): Promise<void> => {
   const userDataPath = app.getPath("userData");
-  const directoryPath = path.join(userDataPath, "trackers", profileId);
+  const directoryPath = path.join(userDataPath, "profiles", profileId, "trackers");
   const filePath = path.join(directoryPath, `${symbol}.json`);
 
   try {
@@ -197,19 +203,14 @@ export const editTrackerFile = async (
   symbol: string,
   updatedConfig: TrackerFileConfig
 ): Promise<void> => {
-  const profiles = await getTrackerConfigs();
   const userDataPath = app.getPath("userData");
-  const filePath = path.join(userDataPath, "trackers", profileId, `${symbol}.json`);
+  const filePath = path.join(userDataPath, "profiles", profileId, "trackers", `${symbol}.json`);
 
-  if (profiles[profileId] && profiles[profileId][symbol]) {
-    try {
-      await fs.writeFile(filePath, JSON.stringify(updatedConfig, null, 2), "utf-8");
-      console.log(`Tracker file updated at ${filePath}`);
-    } catch (error) {
-      console.error(`Error updating tracker file at ${filePath}:`, error);
-    }
-  } else {
-    console.error(`Tracker file for profileId: ${profileId} and symbol: ${symbol} not found.`);
+  try {
+    await fs.writeFile(filePath, JSON.stringify(updatedConfig, null, 2), "utf-8");
+    console.log(`Tracker file updated at ${filePath}`);
+  } catch (error) {
+    console.error(`Error updating tracker file at ${filePath}:`, error);
   }
 };
 

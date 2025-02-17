@@ -19,5 +19,10 @@ interface Window {
         getTrackerMetricsByProfileId: (profileId: string) => Promise<ProfileTrackerMetrics>,
         createTrackerFile: (profileId: string, symbol: string, trackerConfig: TrackerFileConfig) => Promise<void>,
         editTrackerFile: (profileId: string, symbol: string, updatedConfig: TrackerFileConfig) => Promise<void>,
+        
+        // Ledger methods
+        getLedger: (profileId: string) => Promise<Array<Transaction>>,
+        addLedgerTransaction: (profileId: string, transaction: Transaction) => Promise<void>,
+        createLedgerFile: (profileId: string, transactions?: Transaction[]) => Promise<void>,
     };
 }

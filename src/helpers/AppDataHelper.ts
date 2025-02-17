@@ -1,6 +1,6 @@
-import { readAppData, writeAppData } from "@/helpers/ElectronHelper";
+import { createLedgerFile, readAppData, writeAppData } from "@/helpers/ElectronHelper";
 import { isEmptyObject } from "./Helpers";
-import { Profile, Credential, Transaction } from "main/models";
+import { Profile, Credential } from "main/models";
 import { validateProfileExistence } from "@/helpers/Helpers";
 
 export const updateProfile = async (
@@ -104,7 +104,6 @@ export const createProfile = async (
       appConfig: {
         trackerEnabled: false,
       },
-      ledger: [],
     };
 
     // Add the new profile to the profiles array
@@ -113,108 +112,14 @@ export const createProfile = async (
     // Write the updated data back to the file
     await writeAppData(appData);
 
+    //create our initial ledger file
+    await createLedgerFile(newProfile.id);
+
+    console.log(`New profile created: ID ${newProfile.id}, Name: ${name}`);
+
     return newProfile;
   } catch (error) {
     console.error("Error in createProfile:", error.message);
     throw error; // Propagate the error to the caller
   }
 };
-
-export async function getLedgerByProfileId(
-  profileId: string
-): Promise<Array<Transaction>> {
-  try {
-    // Load the appData object
-    const appData = await readAppData();
-
-    if (isEmptyObject(appData)) {
-      throw new Error("Empty or invalid AppData file.");
-    }
-
-    if (!Array.isArray(appData.profiles)) {
-      throw new Error("No profiles on appData object.");
-    }
-
-    // Find the profile by its ID
-    const profile = appData.profiles.find((p) => p.id === profileId);
-
-    if (!profile) {
-      throw new Error(`Profile with ID ${profileId} not found.`);
-    }
-
-    // Return the ledger array
-    return profile.ledger ?? [];
-  } catch (error) {
-    console.error("Error fetching ledger by profile ID:", error.message);
-    throw error;
-  }
-}
-
-export const addToLedger = async (
-  profileId: string,
-  entry: Transaction
-): Promise<void> => {
-  try {
-    // Load the appData object
-    const appData = await readAppData();
-
-    if (!appData || !Array.isArray(appData.profiles)) {
-      throw new Error("Invalid app data structure.");
-    }
-
-    // Find the profile by profileId
-    const profile = appData.profiles.find((p) => p.id === profileId);
-
-    if (!profile) {
-      throw new Error(`Profile with ID ${profileId} not found.`);
-    }
-
-    // Add the new entry to the ledger
-    profile.ledger = profile.ledger ?? [];
-    profile.ledger.push(entry);
-
-    // Save the updated appData
-    await writeAppData(appData);
-
-    console.log(`Added new ledger entry for profile ID ${profileId}`);
-  } catch (error) {
-    console.error("Error adding to ledger:", error.message);
-    throw error;
-  }
-};
-
-export async function getBalanceHeldByAssistentByProfileId(
-  profileId: string
-): Promise<number> {
-  try {
-    // Load the appData object
-    const appData = await readAppData();
-
-    if (isEmptyObject(appData)) {
-      throw new Error("Empty or invalid AppData file.");
-    }
-
-    if (!Array.isArray(appData.profiles)) {
-      throw new Error("No profiles on appData object.");
-    }
-
-    // Find the profile by its ID
-    const profile = appData.profiles.find((p) => p.id === profileId);
-
-    if (!profile) {
-      throw new Error(`Profile with ID ${profileId} not found.`);
-    }
-
-    const ledger = profile.ledger ?? [];
-    if (!ledger.length) {
-      return profile.trackerConfig.initialDeposit;
-    }
-    return ledger[ledger.length - 1].balance;
-  } catch (error) {
-    console.error(
-      "Error fetching assistant balance by profile ID:",
-      error.message
-    );
-    throw error;
-  }
-}
