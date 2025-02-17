@@ -89,11 +89,11 @@ const finalizeCryptos = async () => {
   await updateProfile(props.profileId, (profile) => {
     profile.trackerConfig.whiteList.push(...whiteListAdditions);
   });
-  router.push({ name: "portfolio", params: { profileId: props.profileId } });
-
   for (const selectedCrypto of selectedCryptos.value) {
     await createNewTrackerFile(props.profileId, selectedCrypto.value);
   }
+  
+  router.push({ name: "portfolio", params: { profileId: props.profileId } });
 };
 
 onMounted(async () => {
