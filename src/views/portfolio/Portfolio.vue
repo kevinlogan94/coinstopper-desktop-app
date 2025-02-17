@@ -1,9 +1,7 @@
 <template>
   <Message v-if="showSetupMessage">
     <div class="flex align-items-center">
-      <span
-        >Test Banner for the Onboarding Modal</span
-      >
+      <span>Test Banner for the Onboarding Modal</span>
       <Button
         label="Start Setup"
         class="p-button-text p-0 pl-3"
@@ -122,7 +120,9 @@
     <!-- Right Side Bar -->
     <div class="flex w-4 p-5 crypto-list">
       <ul class="p-0 w-7 m-0">
-        <li class="flex p-1 slim-border bg-gray-850 align-items-center justify-content-between">
+        <li
+          class="flex p-1 slim-border bg-gray-850 align-items-center justify-content-between"
+        >
           <p class="m-0 ml-1">Cryptocurrencies</p>
           <Button
             icon="pi pi-plus"
@@ -134,26 +134,29 @@
         <li
           v-for="(currency, index) in cryptocurrencies"
           :key="index"
-          @click="goToViewCrypto(currency.product_id)"
+          @click="goToViewCrypto(currency.symbol)"
           class="flex justify-content-between text-sm slim-border bg-gray-850 cursor-pointer"
         >
           <div>
-            <p class="m-1">{{ currency.currency }}</p>
-            <p class="m-1">{{ currency.balanceInCrypto }}</p>
+            <p class="m-1">{{ currency.symbol }}</p>
+            <p class="m-1">{{ currency.held }}</p>
           </div>
           <div class="flex flex-column align-items-end">
             <p class="m-1">
-              {{ formatNumber(currency.priceInUSD, { currency: true }) }}
+              {{ formatNumber(currency.plAmount, { currency: true }) }}
             </p>
             <p
               class="m-1"
-              :class="
-                currency.priceChangePercentage24h > 0
-                  ? 'text-green-500'
-                  : 'text-red-500'
-              "
+              :class="{
+                'text-green-500': currency.plPercentage > 0,
+                'text-red-500': currency.plPercentage < 0,
+              }"
             >
-              {{ currency.priceChangePercentage24h }}%
+              {{
+                formatNumber(currency.plPercentage, {
+                  percentage: true,
+                })
+              }}
             </p>
           </div>
         </li>
@@ -177,7 +180,6 @@ import Accordion from "primevue/accordion";
 import AccordionTab from "primevue/accordiontab";
 import OnboardingModal from "@/components/portfolio/OnboardingModal.vue";
 import Message from "primevue/message";
-import { getAllCoinbaseCryptoProductDataByProfileId } from "@/helpers/CoinbaseHelper";
 import {
   getLedgerByProfileId,
   getProfile,
@@ -189,7 +191,11 @@ import { getBuyingMetrics } from "@/helpers/Helpers";
 import TransactionList from "@/components/portfolio/TransactionList.vue";
 import Card from "primevue/card";
 import { LabelValuePair } from "@/models";
-import { startTradingAssistant, stopTradingAssistant } from '@/helpers/ElectronHelper';
+import {
+  startTradingAssistant,
+  stopTradingAssistant,
+} from "@/helpers/ElectronHelper";
+import { getTrackerMetricsByProfileId } from "@/helpers/TrackerFileHelper";
 
 const displayOnboardingModal = ref<boolean>(false);
 const showSetupMessage = ref<boolean>(false);
@@ -231,7 +237,7 @@ const handleOnboardingModalOpen = () => {
   if (!profile.value?.trackerConfig?.initialDeposit) {
     displayOnboardingModal.value = true;
   }
-}
+};
 
 const setupPortfolio = async () => {
   isLoading.value = true;
@@ -244,7 +250,7 @@ const setupPortfolio = async () => {
 
   //Organize data on the screen
   organizeLedgerData();
-  organizePriceChange();
+  // organizePriceChange();
   organizeBuyingPower();
   setupCryptoDisplay();
   organizeKpis();
@@ -256,24 +262,19 @@ const setupCryptoDisplay = async (): Promise<void> => {
   const whiteList = profile.value?.trackerConfig?.whiteList;
 
   if (whiteList?.length) {
-    // Fetch all crypto product data
-    const result = await getAllCoinbaseCryptoProductDataByProfileId(
-      props.profileId
-    );
+    // Fetch tracker metrics data
+    const result = await getTrackerMetricsByProfileId(props.profileId);
 
     // Filter to only include whitelisted products
-    cryptocurrencies.value = result.filter((product) =>
-      whiteList.includes(product.product_id)
-    );
+    cryptocurrencies.value = Object.entries(result.individualCoinMetrics)
+      .filter(([symbol, _]) => whiteList.includes(symbol))
+      .map(([symbol, crypto]) => ({
+        ...crypto,
+        symbol,
+      }));
   }
 };
-const organizePriceChange = () => {
-  const verbiage = "ICON PRICE (PERCENTAGE) Today";
-  priceChange.value = verbiage
-    .replace("ICON", "▼")
-    .replace("PRICE", formatNumber("20", { currency: true }))
-    .replace("PERCENTAGE", formatNumber("0.02", { percentage: true }));
-};
+
 const organizeBuyingPower = async () => {
   var result = await getBuyingMetrics(props.profileId);
 
@@ -285,9 +286,7 @@ const organizeLedgerData = async () => {
   transactions.value = await getLedgerByProfileId(props.profileId);
 };
 const organizeKpis = async () => {
-  const rawMetrics = await window.electronAPI.getTrackerMetricsByProfileId(
-    props.profileId
-  );
+  const rawMetrics = await getTrackerMetricsByProfileId(props.profileId);
   currentPortfolioValue.value = formatNumber(rawMetrics.currentPortfolioValue, {
     currency: true,
   });
