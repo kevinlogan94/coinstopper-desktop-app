@@ -146,7 +146,7 @@ import InputNumber from "primevue/inputnumber";
 import Button from "primevue/button";
 import Dialog from "primevue/dialog";
 import Steps from "primevue/steps";
-import { updateProfile } from "@/helpers/AppDataHelper";
+import { updateProfile, addToLedger } from "@/helpers/AppDataHelper";
 import { Profile } from "main/models";
 import {
   getAllCoinbaseCryptoProductDataByProfileId,
@@ -214,6 +214,16 @@ const finishSetup = async () => {
     profile.trackerConfig.initialDeposit = investmentAmount.value;
     profile.trackerConfig.whiteList = [selectedCrypto.value.value];
   });
+
+  // Add initial ledger entry for the deposit
+  await addToLedger(props.profileId, {
+    amount: investmentAmount.value,
+    balance: investmentAmount.value,
+    symbol: "N/A",
+    timestamp: new Date().toISOString(),
+    description: "Deposit",
+  });
+
   await createNewTrackerFile(props.profileId, selectedCrypto.value.value);
 
   await startTradingAssistant(props.profileId);
