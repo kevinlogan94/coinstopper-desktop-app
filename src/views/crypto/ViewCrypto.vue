@@ -24,15 +24,6 @@
     </template>
 
     <template #content>
-      <!-- Crypto Summary -->
-      <!-- <div class="crypto-summary mb-6">
-        <p>
-          <strong>Current Value:</strong>
-          {{ formatNumber(currentValue, { currency: true }) }}
-        </p>
-        <p><strong>Total Holdings:</strong> {{ totalHoldings }}</p>
-        <p><strong>Percentage Changed:</strong> {{ percentageChanged }}%</p>
-      </div> -->
       <div class="flex flex-wrap gap-3 justify-content-between mb-3">
         <Card v-for="kpi in kpis" :key="kpi.label" class="kpi-card flex-1">
           <template #content>
