@@ -60,7 +60,7 @@
         </p>
         <p>Do you want to proceed?</p>
       </div>
-      <div>
+      <div class="card-footer">
         <Button
             v-if="currentStep > 0"
             label="Back"
@@ -131,13 +131,13 @@ const newBuyingPower = computed(() => {
   );
 });
 
-const finalize = () => {
+const finalize = async() => {
   console.log(
     `${props.action === "allocate" ? "Allocated" : "Withdrawn"} ${
       amount.value
     } to/from profile ${props.profileId}`
   );
-  AddActionToLedger(
+  await AddActionToLedger(
     amount.value,
     props.action === "allocate" ? "deposit" : "withdraw"
   );
