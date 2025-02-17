@@ -1,6 +1,6 @@
 <template>
   <Card class="center-card">
-    <template #title> Add Crypto </template>
+    <template #title> Add Cryptocurrency </template>
     <template #content>
 
       <!-- Step 1: Add Crypto -->

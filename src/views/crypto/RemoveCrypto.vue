@@ -1,10 +1,16 @@
 <template>
   <Card class="center-card">
-    <template #title> Remove Crypto </template>
+    <template #title> Remove Cryptocurrency </template>
     <template #content>
+      <Message severity="warn">
+        <p>This action will not sell the asset, but instead remove the assistant's
+          ability to manage it.</p>
+      </Message>
       <!-- Finalize -->
       <div class="step-content">
-        <p>Review and finalize the crypto to remove from your portfolio:</p>
+        <p>
+          Review and finalize the cryptocurrencies to remove from your assistant's control.
+        </p>
         <ul>
           <li>{{ crypto?.base_name }}</li>
         </ul>
@@ -32,6 +38,7 @@
 import { ref, defineProps, computed, onMounted } from "vue";
 import Button from "primevue/button";
 import Card from "primevue/card";
+import Message from "primevue/message";
 import { updateProfile } from "@/helpers/AppDataHelper";
 import { getAllCoinbaseCryptoProductDataByProfileId } from "@/helpers/CoinbaseHelper";
 import router from "@/router";
@@ -66,7 +73,7 @@ onMounted(async () => {
 <style scoped>
 .center-card {
   margin: auto;
-  max-width: 500px;
+  max-width: 800px;
 }
 .card-footer {
   display: flex;
