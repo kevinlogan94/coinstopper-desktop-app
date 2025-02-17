@@ -43,7 +43,7 @@
         <Card
           v-for="kpi in kpis"
           :key="kpi.label"
-          class="kpi-card flex-1 bg-gray-850"
+          class="kpi-card flex-1 bg-gray-850 p-1"
         >
           <template #content>
             <p class="text-sm text-color-secondary">{{ kpi.label }}</p>

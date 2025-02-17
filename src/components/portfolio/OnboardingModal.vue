@@ -209,7 +209,7 @@ const goToStep = (step: number) => {
 };
 
 const finishSetup = async () => {
-  updateProfile(props.profileId, (profile: Profile) => {
+  await updateProfile(props.profileId, (profile: Profile) => {
     profile.appConfig.trackerEnabled = true;
     profile.trackerConfig.initialDeposit = investmentAmount.value;
     profile.trackerConfig.whiteList = [selectedCrypto.value.value];

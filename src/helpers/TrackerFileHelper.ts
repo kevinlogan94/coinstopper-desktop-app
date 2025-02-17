@@ -2,23 +2,30 @@ import { createTrackerFile, editTrackerFile, fetchTrackerMetricsByProfileId, get
 import { TrackerFileConfig } from "main/models";
 import { validateProfileExistence } from "@/helpers/Helpers";
 import { ProfileTrackerMetrics } from "main/services/trackerFileManager";
-import { getLedgerByProfileId } from "./AppDataHelper";
+import { getLedgerByProfileId, getProfile } from "./AppDataHelper";
 
 export const createNewTrackerFile = async (
   profileId: string,
   symbol: string
 ): Promise<void> => {
   try {
+    // Validate profile existence
+    await validateProfileExistence(profileId);
+
     // Check if the tracker file already exists
     const existingTrackers = await getTrackersByProfileId(profileId);
     if (existingTrackers[symbol]) {
       throw new Error(`Tracker file for ${symbol} already exists.`);
     }
 
-    // Fetch the ledger and get the latest transaction
+    const profile = await getProfile(profileId);
     const ledger = await getLedgerByProfileId(profileId);
-    const latestTransaction = ledger[ledger.length - 1];
-    const availableFunds = latestTransaction ? latestTransaction.balance : 0;
+    const latestTransaction = ledger.length ? ledger[ledger.length - 1] : null;
+
+    //If we don't have a latest transaction, we'll use the initial deposit from the profile's tracker config
+    const availableFunds = latestTransaction
+      ? latestTransaction.balance
+      : profile.trackerConfig.initialDeposit ?? 0;
 
     // Define a default tracker config
     const defaultTrackerConfig: TrackerFileConfig = {
@@ -57,9 +64,6 @@ export const createNewTrackerFile = async (
       positions: [],
       errors: [],
     };
-
-    // Validate profile existence
-    await validateProfileExistence(profileId);
 
     // Create the tracker file
     await createTrackerFile(profileId, symbol, defaultTrackerConfig);

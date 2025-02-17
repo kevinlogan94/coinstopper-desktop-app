@@ -178,9 +178,13 @@ export const createTrackerFile = async (
   trackerConfig: TrackerFileConfig
 ): Promise<void> => {
   const userDataPath = app.getPath("userData");
-  const filePath = path.join(userDataPath, "trackers", profileId, `${symbol}.json`);
+  const directoryPath = path.join(userDataPath, "trackers", profileId);
+  const filePath = path.join(directoryPath, `${symbol}.json`);
 
   try {
+    // Ensure the directory exists
+    await fs.mkdir(directoryPath, { recursive: true });
+
     await fs.writeFile(filePath, JSON.stringify(trackerConfig, null, 2), "utf-8");
     console.log(`Tracker file created at ${filePath}`);
   } catch (error) {
