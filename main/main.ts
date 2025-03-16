@@ -74,6 +74,8 @@ app.on("ready", async () => {
     app.dock.setIcon(icon);
   }
 
+  app.commandLine.appendSwitch("inspect", '9229');
+
   createWindow();
   createTray();
 });
