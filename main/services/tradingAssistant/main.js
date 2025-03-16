@@ -8,15 +8,16 @@ const Recommendations = require('./recommendations');
 const { loadTrackingData, loadGlobalData, saveGlobalData, loadAllTrackingData, saveTrackingData, saveAllTrackingData } = require('./fileOperations');
 const { availableMemory } = require('process');
 
-class TrackerProcessor {
-    constructor(settings) {
+export class TrackerProcessor {
+    constructor(settings, filePath) {
         this.settings = settings;
+        this.settings.filePath = filePath;
         this.apiClient = new CBAdvancedTradeClient({ apiKey: this.settings.apiCredentials.apiKey, apiSecret: this.settings.apiCredentials.apiSecret });
         this.logger = new Logger(this.settings.logging.level, './logs');
         this.centralBank = new CentralBank(this.apiClient, this.logger, this.settings);
         this.marketAnalyzer = new MarketAnalyzer(this.apiClient, this.logger, this.settings);
         this.recommendations = new Recommendations(this.logger);
-        this.trackingDataDirectory = this.settings.trackingDataDirectory || './trackingData/';
+        this.trackingDataDirectory = this.settings.filePath + '/trackers/';
     }
 
     createDefaultTrackingData(productInfo) {
@@ -424,3 +425,4 @@ class TrackerProcessor {
         }
     }
 }
+
