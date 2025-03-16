@@ -1,5 +1,7 @@
 import { fork } from 'child_process';
 import { app, ipcMain } from 'electron';
+import { readAppData } from './appDataManager';
+import { TrackerProcessor } from './tradingAssistant/main';
 
 class TradingAssistantManager {
   private profileProcesses: Map<string, NodeJS.Timeout> = new Map(); // Maps profile IDs to intervals
@@ -25,10 +27,16 @@ class TradingAssistantManager {
     const filePath = app.getPath('userData');
     console.log("TRACKER PROCESS");
 
+    // Get the profile
+    const appData = await readAppData();
+    const profile = appData[profileID];
+    const tracker = new TrackerProcessor(profile, filePath);
+
     // Run a child process for this profile at 10-second intervals
     const interval = setInterval(async () => {
       try {
         console.log("TRACKER PROCESS"); //Insert tracker method here.
+        await tracker.processTrackers();
         console.log(`Tracker process completed successfully for profile ${profileID}.`);
       } catch (error) {
         console.error(`Error in Tracker process for profile ${profileID}:`, error);
