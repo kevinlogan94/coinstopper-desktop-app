@@ -1,4 +1,4 @@
-import { ipcMain, BrowserWindow, shell } from "electron";
+import { ipcMain, shell } from "electron";
 
 export const registerMiscellaneousMethods = () => {
   //Open a url on the user's default browser
