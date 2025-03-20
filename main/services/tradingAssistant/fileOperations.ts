@@ -1,5 +1,6 @@
-const fs = require('fs');
-const path = require('path');
+import * as fs from 'fs';
+import { TrackerFileConfig } from 'main/models';
+import * as path from 'path';
 
 /**
  * Loads a single trackingData file based on the provided symbol name.
@@ -8,7 +9,7 @@ const path = require('path');
  * @returns {Object} - The parsed content of the trackingData file.
  * @throws {Error} - If the file does not exist or fails to load.
  */
-function loadTrackingData(symbol, dataDirectory) {
+function loadTrackingData(symbol: string, dataDirectory: string): object {
     try {
         const fileName = `${symbol.replace('/', '-')}.json`;
         const filePath = path.join(dataDirectory, fileName);
@@ -31,7 +32,7 @@ function loadTrackingData(symbol, dataDirectory) {
  * @returns {Object} - The parsed content of the global.json file.
  * @throws {Error} - If the file does not exist or fails to load.
  */
-function loadGlobalData(appDirectory) {
+function loadGlobalData(appDirectory: string): object {
     try {
         const filePath = path.join(appDirectory, 'global.json');
 
@@ -40,8 +41,7 @@ function loadGlobalData(appDirectory) {
         }
 
         const fileContent = fs.readFileSync(filePath, 'utf-8');
-        if (!fileContent)
-            return {};
+        if (!fileContent) return {};
         return JSON.parse(fileContent);
     } catch (error) {
         console.error(`Error loading global data: ${error.message}`);
@@ -55,7 +55,7 @@ function loadGlobalData(appDirectory) {
  * @param {Object} globalData - The data to save into the global.json file.
  * @throws {Error} - If the file fails to save.
  */
-function saveGlobalData(appDirectory, globalData) {
+function saveGlobalData(appDirectory: string, globalData: object): void {
     try {
         const filePath = path.join(appDirectory, 'global.json');
         fs.writeFileSync(filePath, JSON.stringify(globalData, null, 2));
@@ -71,7 +71,7 @@ function saveGlobalData(appDirectory, globalData) {
  * @param {string} dataDirectory - The directory where trackingData files are stored.
  * @returns {Object[]} - An array of parsed trackingData objects.
  */
-function loadAllTrackingData(dataDirectory) {
+function loadAllTrackingData(dataDirectory: string): TrackerFileConfig[] {
     try {
         const trackingFiles = fs.readdirSync(dataDirectory);
         return trackingFiles.map(file =>
@@ -89,55 +89,11 @@ function loadAllTrackingData(dataDirectory) {
  * @param {Object} trackingData - The trackingData object to save.
  * @throws {Error} - If the file fails to save.
  */
-function saveTrackingData(dataDirectory, trackingData) {
+function saveTrackingData(dataDirectory: string, trackingData: TrackerFileConfig): void {
     try {
         const filePath = path.join(dataDirectory, `${trackingData.symbol.replace('/', '-')}.json`);
         trackingData.datestamp = new Date().toISOString();
-        
-        //reconstruct the object so it's ordered and trimmed each time it is saved
-        const x = trackingData
-        const content = {
-            parameters: x.parameters,
-            overrideParameters: x.overrideParameters,
-            autoBuyInsActive: x.autoBuyInsActive,
-            manualPurchaseAmount: x.manualPurchaseAmount,
-            manualSell: x.manualSell,
-            symbol: x.symbol,
-            //active: x.active,
-            //forceBuy: x.forceBuy,
-            //forceSell: x.forceSell,
-            held: x.held,
-            //ordersHeld: x.ordersHeld,
-            heldValueUsd: x.heldValueUsd,
-            buyPrice: x.buyPrice,
-            averageBuyPrice: x.averageBuyPrice,
-            plAverage: x.plAverage,
-            //minOpenOrderBuyPrice: x.minOpenOrderBuyPrice,
-            exitPrice: x.exitPrice,
-            currentPrice: x.currentPrice,
-            highestPrice: x.highestPrice,
-            lowestPrice: x.lowestPrice,
-            percentageChange: x.percentageChange,
-            //ordersPl: x.ordersPl,
-            lastActionPrice: x.lastActionPrice,
-            lastActionTime: x.lastActionTime,
-            lastAction: x.lastAction,
-            baseIncrement: x.baseIncrement,
-            quoteIncrement: x.quoteIncrement,
-            availableFunds: x.availableFunds,
-            maxAllocation: x.maxAllocation,
-            datestamp: x.datestamp,
-            recommendation: x.recommendation,
-            //stopState: x.stopState,
-            //openOrders: x.openOrders,
-            positions: x.positions,
-            //positionsTemp: x.positionsTemp,
-            //avgBuyPriceTemp: x.avgBuyPriceTemp,
-            //metrics: x.metrics,
-            //orders: x.orders,
-            errors: x.errors,
-            //candleData: x.candleData
-        }
+        const content = { ...trackingData };
         fs.writeFileSync(filePath, JSON.stringify(content, null, 2));
     } catch (error) {
         console.error(`Error saving tracking data for ${trackingData.symbol}: ${error.message}`);
@@ -151,7 +107,7 @@ function saveTrackingData(dataDirectory, trackingData) {
  * @param {Object[]} trackingDataArray - An array of trackingData objects to save.
  * @throws {Error} - If any file fails to save.
  */
-function saveAllTrackingData(dataDirectory, trackingDataArray) {
+function saveAllTrackingData(dataDirectory: string, trackingDataArray: TrackerFileConfig[]): void {
     try {
         trackingDataArray.forEach(trackingData => {
             saveTrackingData(dataDirectory, trackingData);
@@ -162,4 +118,4 @@ function saveAllTrackingData(dataDirectory, trackingDataArray) {
     }
 }
 
-module.exports = { loadTrackingData, loadGlobalData, saveGlobalData, loadAllTrackingData, saveTrackingData, saveAllTrackingData };
+export { loadTrackingData, loadGlobalData, saveGlobalData, loadAllTrackingData, saveTrackingData, saveAllTrackingData };

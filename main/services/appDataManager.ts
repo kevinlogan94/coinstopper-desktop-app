@@ -1,11 +1,12 @@
 import { app, ipcMain } from "electron";
 import { readFileSync, writeFileSync } from "fs";
+import { AppData } from "main/models";
 import * as path from "path";
 
 const DATA_FILE_NAME = "appData.json";
 
 // Construct a consistent file path for reading/writing:
-const getDataFilePath = () => {
+export const getDataFilePath = () => {
   // This will store data in userData folder, e.g. on Windows: C:\Users\<User>\AppData\Roaming\<app-name>\appData.json
   return path.join(app.getPath("userData"), DATA_FILE_NAME);
 };
@@ -14,14 +15,14 @@ const getDataFilePath = () => {
  * Read JSON data from the file system.
  * Returns either the parsed JSON or an empty object on failure.
  */
-export const readAppData = (): Record<string, unknown> => {
+export const readAppData = (): AppData => {
   try {
     const fileContents = readFileSync(getDataFilePath(), "utf8");
     return JSON.parse(fileContents);
   } catch (error) {
     console.error("Error reading data file:", error);
     // Return an empty object or default data if the file doesn't exist or fails to parse
-    return {};
+    return { profiles: [] };
   }
 };
 
@@ -29,7 +30,7 @@ export const readAppData = (): Record<string, unknown> => {
  * Write JSON data to the file system.
  * @param data - The data to write to the file.
  */
-export const writeAppData = (data: Record<string, unknown>): void => {
+export const writeAppData = (data: AppData): void => {
   try {
     const filePath = getDataFilePath();
     
