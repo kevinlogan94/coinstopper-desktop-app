@@ -38,7 +38,6 @@ class TradingAssistantManager {
     // Run a child process for this profile at 10-second intervals
     const interval = setInterval(async () => {
       try {
-        console.log("TRACKER PROCESS"); //Insert tracker method here.
         await tracker.processTrackers();
         console.log(`Tracker process completed successfully for profile ${profileID}.`);
       } catch (error) {

@@ -3,22 +3,22 @@ import { CBAdvancedTradeClient } from 'coinbase-api';
 import Logger from './logger';
 import CentralBank from './centralBank';
 import { loadAllTrackingData, saveTrackingData } from './fileOperations';
-import { TrackerFileConfig } from 'main/models';
+import { Profile, TrackerFileConfig } from 'main/models';
 
 class TrackerProcessor {
-    private settings: any;
+    private profile: Profile;
     private apiClient: CBAdvancedTradeClient;
     private logger: Logger;
     private centralBank: CentralBank;
     private trackingDataDirectory: string;
 
-    constructor(settings: any, filePath: string) {
-        this.settings = settings;
-        this.settings.filePath = filePath;
-        this.apiClient = new CBAdvancedTradeClient({ apiKey: this.settings.apiCredentials.apiKey, apiSecret: this.settings.apiCredentials.apiSecret });
-        this.logger = new Logger(this.settings.logging.level, './logs');
-        this.centralBank = new CentralBank(this.apiClient, this.logger, this.settings);
-        this.trackingDataDirectory = this.settings.filePath + '/trackers/';
+    constructor(profile: Profile, filePath: string) {
+        this.profile = profile;
+        const credentials = this.profile.credentials.find(x => x.platform === 'coinbase');
+        this.apiClient = new CBAdvancedTradeClient({ apiKey: credentials?.apiKey, apiSecret: credentials?.apisecret });
+        this.logger = new Logger('INFO', './logs');
+        this.centralBank = new CentralBank(this.apiClient, this.logger, this.profile.trackerConfig);
+        this.trackingDataDirectory = filePath + '/trackers/';
     }
 
     createDefaultTrackingData(productInfo: any): any {
@@ -30,7 +30,7 @@ class TrackerProcessor {
 
         // Return the default tracking data object
         return {
-            parameters: this.settings.parameters,
+            parameters: this.profile.trackerConfig.parameters,
             overrideParameters: false,
             autoBuyInsActive: false,
             manualPurchaseAmount: null,
@@ -110,8 +110,7 @@ class TrackerProcessor {
             const products = await this.apiClient.getProducts();
 
             const tradableCurrencies = products.products.filter((product: any) => {
-                return product.quote_currency_id === this.settings.quoteCurrency &&
-                    this.settings.blackList.indexOf(product.product_id) < 0 &&
+                return product.quote_currency_id === this.profile.trackerConfig.blackList.indexOf(product.product_id) < 0 &&
                     !product.trading_disabled && !product.is_disabled && !product.view_only &&
                     product.product_type === 'SPOT' &&
                     product.product_venue === 'CBE' &&
@@ -168,8 +167,8 @@ class TrackerProcessor {
             let trackingDataList = await loadAllTrackingData(this.trackingDataDirectory);
             this.logger.info(`Found ${trackingDataList.length} trackers.`);
             const products = await this.getTradableCurrencies();
-            const whitelist = new Set(this.settings.whiteList ?? this.settings.whiteList);
-            const blacklist = new Set(this.settings.blackList ?? this.settings.blackList);
+            const whitelist = new Set(this.profile.trackerConfig.whiteList ?? this.profile.trackerConfig.whiteList);
+            const blacklist = new Set(this.profile.trackerConfig.blackList ?? this.profile.trackerConfig.blackList);
 
             const filteredProducts = products.filter(product =>
                 whitelist.has(product.product_id) && !blacklist.has(product.product_id)
@@ -192,7 +191,7 @@ class TrackerProcessor {
 
             trackingDataList.forEach(tracker => {
                 if (!tracker.overrideParameters) {
-                    tracker.parameters = this.settings.parameters;
+                    tracker.parameters = this.profile.trackerConfig.parameters;
                 }
             });
 
