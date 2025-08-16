@@ -1,111 +1,76 @@
 # Coin Stopper
 
-**Coin Stopper** is a desktop application that empowers users to configure profiles, monitor Coinbase, and automate buy/sell decisions using a custom algorithm. Designed for local operation, all configurations and data remain securely on your machine.
-
----
-
-## Table of Contents
-
-1. [Features](#features)
-2. [Tech Stack](#tech-stack)
-3. [Installation](#installation)
-4. [Usage](#usage)
-5. [Scripts](#scripts)
-6. [Configuration](#configuration)
-
+**Coin Stopper** is a powerful, local-first desktop application designed to automate your cryptocurrency trading on Coinbase using a grid trading strategy. It allows you to create custom trading profiles, monitor the market in real-time, and have buys/sells executed automatically from the security of your own machine.
 
 ---
 
 ## Features
 
-- **Profile Management**: Configure multiple trading profiles with specific strategies.
-- **Coinbase Integration**: Securely connect and trade using your Coinbase account.
-- **Custom Algorithm**: Automate trading decisions based on custom parameters.
-- **Local-Only Storage**: All data is stored locally for enhanced privacy.
-- **Real-Time Monitoring**: Stay updated with market changes and trading actions.
+- **Profile Management**: Create and manage multiple trading profiles with unique strategies.
+- **Secure Coinbase Integration**: Connect your Coinbase account via API keys to execute trades securely.
+- **Trading Algorithm**: Automate trading using a built-in grid strategy algorithm. You control its behavior by defining the grid levels, investment amounts, and other custom parameters.
+- **Local-First Privacy**: All your configuration, API keys, and trading data are stored locally on your machine. Nothing is sent to the cloud.
+- **Real-Time Monitoring**: Keep an eye on market changes and your portfolio's performance with a clean, intuitive dashboard.
+- **Portfolio Tracking**: Keep a ledger of your transactions and track your assets over time.
 
 ---
 
 ## Tech Stack
 
-- **Frontend**: Vue.js with TypeScript
-- **Electron (with Electron Forge)**: For creating a cross-platform desktop application
-- **Backend**: None (local operations only)
-- **API Integration**: Coinbase API
-- **Build Tool**: Vite
-- **Linting**: ESLint (configured for TypeScript and JavaScript)
-- **Packaging**: Electron Forge (with support for Squirrel, ZIP, and DEB/RPM makers)
-- **Charting Library**: Chart.js (used for visual data representation)
+- **Framework**: [Electron](https://www.electronjs.org/) (with Electron Forge)
+- **Frontend**: [Vue.js](https://vuejs.org/) with [TypeScript](https://www.typescriptlang.org/)
+- **UI Components**: [PrimeVue](https://primevue.org/)
+- **Charting**: [Chart.js](https://www.chartjs.org/)
+- **API Integration**: [Coinbase API](https://docs.cloud.coinbase.com/exchange/reference/exchangerestapi_auth)
+- **Build Tool**: [Vite](https://vitejs.dev/)
 
 ---
 
-## Installation
+## Getting Started
+
+Follow these instructions to get the application up and running on your local machine.
 
 ### Prerequisites
-- **Node.js** (latest stable version recommended)
-- **npm** or **yarn**
-- **Coinbase API Credentials**
 
-### Steps
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/coin-stopper.git
-   ```
-2. Navigate to the project directory:
-   ```bash
-   cd coin-stopper
-   ```
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
-4. Start the application in development mode:
-   ```bash
-   npm start
-   ```
+- **Node.js**: v18.x or later
+- **npm**: v8.x or later
+- **Coinbase API Credentials** (API Key and Secret)
 
----
+### Installation & Launch
 
-## Usage
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-username/coin-stopper.git
+    cd coin-stopper
+    ```
 
-1. Launch the application:
-   ```bash
-   npm start
-   ```
-2. Connect your Coinbase account using your API credentials.
-3. Set up and configure trading profiles.
-4. Enable the algorithm to monitor and execute trades.
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-To package the app for local use:
-```bash
-npm run package
-```
-
-To create a production-ready distributable:
-```bash
-npm run make
-```
+3.  **Run the application in development mode:**
+    ```bash
+    npm start
+    ```
 
 ---
 
-## Scripts
+## Available Scripts
 
-Here are the available npm commands:
+The project includes several scripts to help with development and distribution:
 
-| Command             | Description                                                                 |
-|---------------------|-----------------------------------------------------------------------------|
-| `npm start`         | Launches the application in development mode using Electron Forge.         |
-| `npm run package`   | Packages the app for local use (e.g., testing).                            |
-| `npm run make`      | Creates production-ready distributables for all configured platforms.      |
-| `npm run publish`   | Publishes the app to distribution channels (if configured).                |
-| `npm run lint`      | Runs lint checks to ensure code quality.                                   |
+| Command         | Description                                                 |
+| --------------- | ----------------------------------------------------------- |
+| `npm start`     | Starts the application in development mode with hot-reloading. |
+| `npm run package` | Packages the application for your current OS without creating an installer. |
+| `npm run make`  | Builds and bundles the application into a distributable installer. |
+| `npm run lint`  | Lints the codebase to check for errors and style issues.    |
 
 ---
 
 ## Configuration
 
-- **Profiles**: Configure preferences like coin pairs, thresholds, and algorithms.
-- **Local Storage**: All user data is securely stored in the application’s data directory.
-- **Coinbase Credentials**: Ensure your API key and secret are correctly set up during the configuration process.
-
----
+- **Profiles**: Set up your trading strategies by defining coin pairs, buy/sell thresholds, and other algorithmic parameters within the app.
+- **API Keys**: Your Coinbase API credentials are required to connect your account. These are stored securely on your local machine.
+- **Data Storage**: All application data, including logs and transaction history, is stored in the user data directory on your computer.
